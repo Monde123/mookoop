@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "appName": "Mookoop Demo",
+  "themeId": "clean-light",
+  "connectedCanvas": false,
+  "locales": ["en", "fr"],
+  "locale": "en",
+  "device": "android",
+  "orientation": "portrait",
+  "slidesByDevice": {
+    "android": [
+      {
+        "id": "demo-1",
+        "layout": "hero",
+        "label": {
+          "en": "WELCOME",
+          "fr": "BIENVENUE"
+        },
+        "headline": {
+          "en": "Design stunning\nmockups in seconds",
+          "fr": "Créez de superbes\nmockups en secondes"
+        },
+        "screenshot": "",
+        "inverted": false
+      },
+      {
+        "id": "demo-2",
+        "layout": "hero",
+        "label": {
+          "en": "EXPORT",
+          "fr": "EXPORTEZ"
+        },
+        "headline": {
+          "en": "Official resolutions\nready for the store",
+          "fr": "Résolutions officielles\nprêtes pour le store"
+        },
+        "screenshot": "",
+        "inverted": false
+      }
+    ]
+  }
+}

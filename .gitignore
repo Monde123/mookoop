@@ -1,0 +1,25 @@
+node_modules
+.next
+out
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+.env*.local
+
+# Private project configuration & user screenshots (excluded from public repo)
+app-store-screenshots.json
+public/screenshots/uploaded/*
+!public/screenshots/uploaded/.gitkeep
+public/screenshots/android/phone/fr/*
+public/screenshots/android/tablet-7/fr/*
+public/screenshots/android/tablet-10/fr/*
+public/screenshots/**/fr/*
+
+# Fonts imported from the editor toolbar are user assets too (and font licences
+# often forbid redistributing them), so keep them out of the template as well.
+public/fonts/imported/*
+!public/fonts/imported/.gitkeep
+
+# Tester Army output
+.e2e/
+

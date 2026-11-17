@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none">
+  <defs>
+    <linearGradient id="logo-bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+
+    <linearGradient id="logo-primary" x1="15%" y1="20%" x2="85%" y2="80%">
+      <stop offset="0%" stop-color="#818CF8"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+
+    <linearGradient id="logo-secondary" x1="85%" y1="20%" x2="15%" y2="80%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="60%" stop-color="#E0E7FF"/>
+      <stop offset="100%" stop-color="#A5B4FC"/>
+    </linearGradient>
+
+    <linearGradient id="text-oo-1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+
+    <linearGradient id="text-oo-2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Icon Mark (64x64) -->
+  <g transform="translate(8, 8)">
+    <rect x="0" y="0" width="64" height="64" rx="16" fill="url(#logo-bg-grad)" stroke="#1E293B" stroke-width="1.5"/>
+    
+    <!-- Viewfinder corners -->
+    <path d="M 10 18 L 10 12 L 16 12" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 54 18 L 54 12 L 48 12" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 10 46 L 10 52 L 16 52" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 54 46 L 54 52 L 48 52" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Pair 1 of 'oo' -->
+    <circle cx="23" cy="32" r="9" stroke="url(#logo-primary)" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="30" cy="32" r="9" stroke="url(#logo-primary)" stroke-width="3" stroke-linecap="round" stroke-opacity="0.9"/>
+
+    <!-- Pair 2 of 'oo' (factorized) -->
+    <circle cx="34" cy="32" r="9" stroke="url(#logo-secondary)" stroke-width="3" stroke-linecap="round" stroke-opacity="0.95"/>
+    <circle cx="41" cy="32" r="9" stroke="url(#logo-secondary)" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Factorization Center Dot -->
+    <circle cx="32" cy="32" r="2" fill="#38BDF8"/>
+  </g>
+
+  <!-- Wordmark 'mookoop' -->
+  <g transform="translate(88, 51)" font-family="system-ui, -apple-system, 'Segoe UI', Inter, sans-serif" font-size="34" font-weight="700" letter-spacing="-0.03em">
+    <!-- m -->
+    <text x="0" y="0" fill="#F8FAFC">m</text>
+    <!-- oo (pair 1 - highlighted) -->
+    <text x="33" y="0" fill="url(#text-oo-1)">oo</text>
+    <!-- k -->
+    <text x="73" y="0" fill="#F8FAFC">k</text>
+    <!-- oo (pair 2 - highlighted) -->
+    <text x="94" y="0" fill="url(#text-oo-2)">oo</text>
+    <!-- p -->
+    <text x="134" y="0" fill="#F8FAFC">p</text>
+  </g>
+
+  <!-- Subtitle Tagline -->
+  <text x="90" y="66" font-family="system-ui, -apple-system, 'Segoe UI', Inter, sans-serif" font-size="10" font-weight="500" fill="#64748B" letter-spacing="0.08em">UNIVERSAL SCREENSHOT STUDIO</text>
+</svg>

@@ -10,13 +10,16 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: "deafTranslator — Studio Screenshots",
-  description: "Design and export App Store + Google Play screenshots.",
+  title: "mookoop — Universal App Store & Play Store Screenshot Studio",
+  description: "Universal open-source studio to craft official mockups and store banners for iOS and Android.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={lato.variable}>
+    <html lang="en" className={lato.variable}>
       <body className={`${inter.className} ${lato.className}`}>{children}</body>
     </html>
   );

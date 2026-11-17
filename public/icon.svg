@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <!-- Background subtle gradient -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+
+    <!-- Factorized Loop 1 gradient (Electric Indigo to Cyan) -->
+    <linearGradient id="loop-primary" x1="15%" y1="20%" x2="85%" y2="80%">
+      <stop offset="0%" stop-color="#818CF8"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+
+    <!-- Factorized Loop 2 gradient (Luminous Titanium & Lavender) -->
+    <linearGradient id="loop-secondary" x1="85%" y1="20%" x2="15%" y2="80%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="60%" stop-color="#E0E7FF"/>
+      <stop offset="100%" stop-color="#A5B4FC"/>
+    </linearGradient>
+
+    <!-- Viewfinder glow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Container Badge (squircle) -->
+  <rect x="6" y="6" width="108" height="108" rx="26" fill="url(#bg-grad)" stroke="#1E293B" stroke-width="2"/>
+
+  <!-- Optical frame guide (Subtle mockup corner indicators) -->
+  <path d="M 24 38 L 24 28 L 34 28" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 96 38 L 96 28 L 86 28" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 24 82 L 24 92 L 34 92" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 96 82 L 96 92 L 86 92" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Center Aperture subtle grid -->
+  <circle cx="60" cy="60" r="32" stroke="#1E293B" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+  <!-- FACTORIZED 'oo' PAIR 1: Left double-ring loop (m[oo]k) -->
+  <!-- Outer stroke for the first pair of 'o' -->
+  <g filter="url(#glow)">
+    <!-- Left 'o' (first ring) -->
+    <circle cx="43" cy="60" r="17" stroke="url(#loop-primary)" stroke-width="5" stroke-linecap="round"/>
+    <!-- Intersecting 'o' (second ring of pair 1) -->
+    <circle cx="57" cy="60" r="17" stroke="url(#loop-primary)" stroke-width="5" stroke-linecap="round" stroke-opacity="0.9"/>
+  </g>
+
+  <!-- FACTORIZED 'oo' PAIR 2: Right double-ring loop (k[oo]p) -->
+  <!-- Overlapping and interlocked with pair 1 -->
+  <!-- Third ring of factorized symbol -->
+  <circle cx="63" cy="60" r="17" stroke="url(#loop-secondary)" stroke-width="5" stroke-linecap="round" stroke-opacity="0.95"/>
+  <!-- Fourth ring of factorized symbol (final 'o') -->
+  <circle cx="77" cy="60" r="17" stroke="url(#loop-secondary)" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Center harmonic focal point (factorization nexus) -->
+  <circle cx="60" cy="60" r="4" fill="#38BDF8"/>
+  <circle cx="60" cy="60" r="1.5" fill="#FFFFFF"/>
+</svg>

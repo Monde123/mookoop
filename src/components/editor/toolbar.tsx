@@ -1,7 +1,10 @@
 "use client";
 import * as React from "react";
-import { AlertTriangle, Check, Cloud, Download, FlaskConical, Redo2, RotateCcw, Undo2, UnfoldHorizontal, Upload } from "lucide-react";
+import { AlertTriangle, Archive, Check, Cloud, Download, FlaskConical, Redo2, RotateCcw, Sparkles, Undo2, UnfoldHorizontal, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MookoopLogo } from "@/components/brand/logo";
+import { DemosDialog } from "./demos-dialog";
+import type { DemoPreset } from "@/lib/demos";
 import {
   Dialog,
   DialogContent,
@@ -58,6 +61,7 @@ type Props = {
   orientation: Orientation;
   setOrientation: (v: Orientation) => void;
   onExport: () => void;
+  onDownloadSingle?: () => void;
   onResetAll: () => void;
   onResetDevice: () => void;
   onUndo: () => void;
@@ -68,6 +72,7 @@ type Props = {
   savedAt: number | null;
   saveError: string | null;
   onRetrySave?: () => void;
+  onLoadDemo: (demo: DemoPreset) => void;
   busy: boolean;
 };
 
@@ -75,6 +80,7 @@ export function Toolbar(props: Props) {
   const platform = platformOf(props.device);
   const hasLandscape = supportsLandscape(props.device);
   const [resetOpen, setResetOpen] = React.useState(false);
+  const [demosOpen, setDemosOpen] = React.useState(false);
 
   const lastByPlatform = React.useRef<Record<Platform, Device>>(
     Object.fromEntries(PLATFORMS.map(({ id }) => [id, id === platform ? props.device : devicesOf(id)[0]])) as Record<Platform, Device>,
@@ -99,6 +105,25 @@ export function Toolbar(props: Props) {
 
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-b bg-card/40 px-4 py-2">
+      <div className="flex items-center gap-1.5 mr-1 shrink-0">
+        <MookoopLogo size={28} />
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="h-8 gap-1.5 px-2.5 text-xs font-semibold text-indigo-400 border-indigo-500/30 hover:text-indigo-300 hover:bg-indigo-950/40 hover:border-indigo-500/60 transition-colors"
+        onClick={() => setDemosOpen(true)}
+        disabled={props.busy}
+        title="Explorer les modèles et démos universelles"
+      >
+        <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
+        <span>Modèles</span>
+      </Button>
+
+      <span aria-hidden className="mx-1 h-5 w-px bg-border" />
+
       <Input
         value={props.appName}
         onChange={(e) => props.setAppName(e.target.value)}
@@ -301,14 +326,25 @@ export function Toolbar(props: Props) {
           <RotateCcw className="h-4 w-4" />
         </Button>
         <Button
+          variant="outline"
+          onClick={props.onDownloadSingle}
+          disabled={!!props.exporting || importingFont}
+          size="sm"
+          className="h-8 gap-1.5 px-2.5 text-xs font-medium"
+          title="Télécharger immédiatement cet écran en PNG haute résolution"
+        >
+          <Download className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Télécharger (PNG)</span>
+        </Button>
+        <Button
           onClick={props.onExport}
           disabled={!!props.exporting || importingFont}
           size="sm"
-          className="h-8"
-          title="Export every size × locale for this device as a zip"
+          className="h-8 gap-1.5 px-3 text-xs"
+          title="Exporter tous les écrans et toutes les résolutions dans une archive ZIP"
         >
-          <Download className="h-4 w-4" />
-          {props.exporting ? `Exporting ${props.exporting}` : "Export bundle"}
+          <Archive className="h-3.5 w-3.5" />
+          {props.exporting ? `Exportation ${props.exporting}` : "Tout exporter (ZIP)"}
         </Button>
       </div>
 
@@ -347,6 +383,12 @@ export function Toolbar(props: Props) {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DemosDialog
+        open={demosOpen}
+        onOpenChange={setDemosOpen}
+        onSelectDemo={props.onLoadDemo}
+      />
     </div>
   );
 }

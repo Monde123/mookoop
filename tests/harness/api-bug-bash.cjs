@@ -110,7 +110,7 @@ async function check(name, run) { await run(); console.log('PASS', name); passed
       }
     });
     await check('documented migration handles null overlays and duplicate element IDs', async () => {
-      const skill = await fs.readFile(path.join(__dirname,'../../../SKILL.md'),'utf8').catch(error => { if (error.code !== 'ENOENT') throw error; return null; });
+      const skill = await fs.readFile(path.join(__dirname,'../../SKILL.md'),'utf8').catch(error => { if (error.code !== 'ENOENT') throw error; return null; });
       const source = skill
         ? skill.match(/BACKUP_DIR="\$BACKUP_DIR" node <<'NODE'\n([\s\S]*?)\nNODE/)[1]
         : await fs.readFile(path.join(__dirname,'migration-fixture.cjs'),'utf8');

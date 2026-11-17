@@ -1,10 +1,12 @@
 "use client";
 import * as React from "react";
+import { flushSync } from "react-dom";
 import JSZip from "jszip";
 import { Toaster, toast } from "sonner";
 import { DEFAULT_SCREENSHOT_FONT_ID, IMPORTED_FONT_FAMILY, hasTheme, screenshotFontFamily, themeById } from "@/lib/constants";
 import { copySlide, updateDeck, updateSlide as updateSlideIn, withElementTransform } from "@/lib/deck";
 import { canvasSize, deviceForOrientation, getExportSizes, platformOf, validOrientation } from "@/lib/devices";
+import { isFeatureGraphic } from "@/lib/layouts";
 import { renderSlide, waitForPaint } from "@/lib/export-render";
 import { deckAssetPaths, preloadPaths, screenshotIssues } from "@/lib/export-assets";
 import { setFrameAssets, type FrameFile, type MeasuredFrame } from "@/lib/frame-assets";
@@ -33,6 +35,7 @@ export function ScreenshotEditor() {
   const exportInProgress = React.useRef(false);
   const [exportProject, setExportProject] = React.useState<ProjectState | null>(null);
   const exportRef = React.useRef<HTMLDivElement | null>(null);
+  const exportStripRef = React.useRef<HTMLDivElement | null>(null);
   const [styleLabOpen, setStyleLabOpen] = React.useState(false);
   // The latest committed project, for actions that must check nothing changed since.
   const latestState = React.useRef(state);
@@ -261,6 +264,72 @@ export function ScreenshotEditor() {
     }
   }
 
+  async function downloadSingleSlide() {
+    if (!activeSlide || exportInProgress.current) return;
+    exportInProgress.current = true;
+    setExporting("Preparing…");
+
+    const currentSlides = state.slidesByDevice[state.device] || [];
+    const slideIdx = currentSlides.findIndex((s) => s.id === activeSlide.id);
+    const idx = slideIdx >= 0 ? slideIdx : 0;
+    const { cW, cH } = canvasSize(state.device, state.orientation);
+
+    try {
+      flushSync(() => {
+        setExportProject(state);
+        setExportLocaleOverride(state.locale);
+        setExportSlideIndex(idx);
+      });
+      if (exportStripRef.current) {
+        exportStripRef.current.style.left = `${-idx * cW}px`;
+      }
+      await waitForPaint();
+
+      // Ensure DOM is synced
+      let syncAttempts = 0;
+      while (
+        syncAttempts < 6 &&
+        exportRef.current?.getAttribute("data-export-slide-index") !== String(idx)
+      ) {
+        await new Promise((r) => setTimeout(r, 25));
+        syncAttempts++;
+      }
+      await waitForPaint();
+
+      const el = exportRef.current;
+      if (!el) throw new Error("Cible de rendu introuvable");
+
+      setExporting("Rendering…");
+      let rendered;
+      try {
+        rendered = await captureSlide(el, cW, cH);
+      } catch (firstErr) {
+        await new Promise((r) => setTimeout(r, 150));
+        await waitForPaint();
+        rendered = await captureSlide(el, cW, cH);
+      }
+      const sizes = getExportSizes(state.device, state.orientation);
+      const targetSize = sizes[0] || { w: cW, h: cH };
+      const bytes = await rendered.toPng(targetSize.w, targetSize.h);
+      const blob = new Blob([bytes as any], { type: "image/png" });
+      const slug = slugify(state.appName || "mockup");
+      const filename = isFeatureGraphic(activeSlide, state.device)
+        ? `${slug}-feature-graphic.png`
+        : `${slug}-${state.device}-${String(idx + 1).padStart(2, "0")}-${activeSlide.layout}.png`;
+      downloadBlob(blob, filename);
+      toast.success("Mockup téléchargé en PNG haute résolution");
+    } catch (err) {
+      toast.error("Échec du téléchargement", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setExportLocaleOverride(null);
+      setExportProject(null);
+      setExporting(null);
+      exportInProgress.current = false;
+    }
+  }
+
   async function generateBundle() {
     if (!currentSlides.length) {
       toast.error("No screens to export");
@@ -341,15 +410,35 @@ export function ScreenshotEditor() {
     // for the previous screen first keeps at most one screen's pixels queued.
     let encoding: Promise<void> = Promise.resolve();
     for (const locale of locales) {
-      setExportLocaleOverride(locale);
+      flushSync(() => {
+        setExportLocaleOverride(locale);
+      });
       await waitForPaint();
 
       for (let i = 0; i < currentSlides.length; i++) {
         const slide = currentSlides[i];
         render += 1;
         setExporting(`${render}/${totalRenders}`);
-        setExportSlideIndex(i);
+
+        flushSync(() => {
+          setExportSlideIndex(i);
+        });
+        if (exportStripRef.current) {
+          exportStripRef.current.style.left = `${-i * cW}px`;
+        }
         await waitForPaint();
+
+        // Verify that the DOM actually moved to slide i
+        let syncAttempts = 0;
+        while (
+          syncAttempts < 6 &&
+          exportRef.current?.getAttribute("data-export-slide-index") !== String(i)
+        ) {
+          await new Promise((r) => setTimeout(r, 25));
+          syncAttempts++;
+        }
+        await waitForPaint();
+
         const el = exportRef.current;
         if (!el) {
           await encoding;
@@ -366,7 +455,14 @@ export function ScreenshotEditor() {
         };
         let pngs: Promise<Uint8Array[]>;
         try {
-          const rendered = await captureSlide(el, cW, cH);
+          let rendered;
+          try {
+            rendered = await captureSlide(el, cW, cH);
+          } catch (firstErr) {
+            await new Promise((r) => setTimeout(r, 150));
+            await waitForPaint();
+            rendered = await captureSlide(el, cW, cH);
+          }
           if (rendered.missingImages > 0) incomplete.push(label);
           pngs = Promise.all(sizes.map((size) => rendered.toPng(size.w, size.h)));
         } catch (e) {
@@ -502,6 +598,7 @@ export function ScreenshotEditor() {
         // re-laying out the current one, so both compositions survive.
         setOrientation={(v) => setState((p) => ({ ...p, orientation: v, device: deviceForOrientation(p.device, v) }), { history: false })}
         onExport={exportAll}
+        onDownloadSingle={downloadSingleSlide}
         onResetAll={() => {
           reset();
           setActiveSlideId(null);
@@ -520,6 +617,11 @@ export function ScreenshotEditor() {
         savedAt={savedAt}
         saveError={saveError}
         onRetrySave={retrySave}
+        onLoadDemo={(demo) => {
+          setState(demo.state, { coalesce: false });
+          setActiveSlideId(null);
+          toast.success(`Modèle "${demo.name}" appliqué`);
+        }}
         busy={busy}
       />
 
@@ -644,6 +746,7 @@ export function ScreenshotEditor() {
         {exportSlides.length > 0 && (
           <div
             ref={exportRef}
+            data-export-slide-index={exportSlideIndex}
             style={{
               width: exportCanvas.cW,
               height: exportCanvas.cH,
@@ -654,6 +757,7 @@ export function ScreenshotEditor() {
             }}
           >
             <div
+              ref={exportStripRef}
               style={{
                 position: "absolute",
                 left: -exportSlideIndex * exportCanvas.cW,

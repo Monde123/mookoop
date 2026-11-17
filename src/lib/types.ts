@@ -77,6 +77,8 @@ export type SlideTypography = {
   headlineScale?: number;
   /** Feature graphic app name only (default 1). */
   appNameScale?: number;
+  /** Feature graphic app icon scale (default 1). */
+  appIconScale?: number;
 };
 
 export type ImageElement = {
@@ -111,6 +113,9 @@ export type Slide = {
   /** Optional relative font-size scales for built-in caption text. */
   typography?: SlideTypography;
   backgroundColor?: string;   // per-slide hex color override
+  captionAlign?: "left" | "center" | "right"; // per-slide headline/caption text alignment
+  featureLayout?: "split" | "centered" | "two-devices" | "minimal";
+  featureTilt?: number;       // degrees of tilt for phone mockup in feature graphic (-20 to 20)
   // Per-element overrides; when present, replaces layout default placement.
   transforms?: Partial<Record<BuiltInElementId, ElementTransform>>;
   textElements?: TextElement[];
@@ -119,12 +124,16 @@ export type Slide = {
 };
 
 export type ThemeId =
-  | "deaftranslator-signature"
+  | "minimal-slate"
+  | "obsidian-dark"
   | "clean-light"
+  | "universal-azure"
+  | "nordic-navy"
   | "dark-bold"
   | "warm-editorial"
   | "ocean-fresh"
   | "bloom-roast"
+  | "deaftranslator-signature"
   // One preset per named style in style-prompts/ (same id as the slug).
   | "hand-drawn-editorial-tasks"
   | "retro-rubberhose-mascot"

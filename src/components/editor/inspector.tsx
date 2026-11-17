@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { DEVICES, canvasSize, deviceForOrientation, duoCompanion, isCreative, isDuoDevice, orientationOf } from "@/lib/devices";
-import { captureFits, duoGeometry } from "@/lib/frame-assets";
+import { captureFits, duoGeometry, frameLayout } from "@/lib/frame-assets";
 import { elementRects, elementZ, getElementTransform, selectableLayouts, isFeatureGraphic as isBanner, layoutHint, layoutLabel, showsDevice } from "@/lib/layouts";
 import { COPY_IDEA_SLOTS } from "@/lib/copy-ideas";
 import { nid } from "@/lib/defaults";
@@ -133,6 +133,42 @@ export function Inspector({
     onChange({ [key]: writeLocalized(slide[key], locale, value) } as Partial<Slide>);
   }
 
+  const currentDeviceTransform = isFeatureGraphic ? getElementTransform(slide, device, orientation, "device") : undefined;
+  const basePhoneW = canvasSize(device, orientation).cW * 0.23;
+  const phoneScalePct = currentDeviceTransform ? Math.round((currentDeviceTransform.width / basePhoneW) * 100) : 100;
+
+  function handlePhoneScaleChange(scalePct: number) {
+    const { cW, cH } = canvasSize(device, orientation);
+    const { aspect: frameAspect } = frameLayout("android", "portrait");
+    const baseW = cW * 0.23;
+    const cur = getElementTransform(slide, device, orientation, "device");
+    const newW = Math.round(baseW * (scalePct / 100));
+    const newH = Math.round(newW / frameAspect);
+    const curX = cur?.x ?? Math.round(cW * 0.7);
+    const curY = cur?.y ?? Math.max(10, Math.round((cH - newH) / 2));
+    onChange({
+      transforms: {
+        ...(slide.transforms || {}),
+        device: {
+          x: curX,
+          y: curY,
+          width: newW,
+          height: newH,
+          rotation: cur?.rotation ?? (slide.featureTilt ?? -6),
+          zIndex: cur?.zIndex ?? 3,
+        },
+      },
+    });
+  }
+
+  function handleResetPhoneScale() {
+    if (!slide.transforms?.device) return;
+    const { device: _omitted, ...rest } = slide.transforms;
+    onChange({
+      transforms: Object.keys(rest).length > 0 ? rest : undefined,
+    });
+  }
+
   return (
     <div className="flex h-full flex-col">
       <div className="border-b p-3">
@@ -187,17 +223,15 @@ export function Inspector({
 
         <BackgroundControls slide={isFeatureGraphic ? { ...slide, inverted: slide.inverted ?? true } : slide} theme={theme} onChange={onChange} />
 
-        {!isFeatureGraphic && (
-          <div className="space-y-1.5">
-            <Label className="text-xs">Label</Label>
-            <Input
-              aria-label="Label"
-              value={localeLabel}
-              onChange={(e) => setLocaleField("label", e.target.value)}
-              placeholder={labelPlaceholder}
-            />
-          </div>
-        )}
+        <div className="space-y-1.5">
+          <Label className="text-xs">{isFeatureGraphic ? "Badge promotionnel (Optionnel)" : "Label"}</Label>
+          <Input
+            aria-label={isFeatureGraphic ? "Badge promotionnel" : "Label"}
+            value={localeLabel}
+            onChange={(e) => setLocaleField("label", e.target.value)}
+            placeholder={isFeatureGraphic ? "ex: 100% HORS-LIGNE, NOUVEAU, ★ 4.9" : labelPlaceholder}
+          />
+        </div>
 
         <div className="space-y-1.5">
           <div className="flex items-baseline justify-between">
@@ -260,27 +294,112 @@ export function Inspector({
           onSelectElement={onSelectElement}
         />
 
-        {!isFeatureGraphic && (
-          <ElementTransformControls
-            slide={slide}
-            defaultTextColor={slideColors(theme, slide).fg}
-            device={device}
-            orientation={orientation}
-            locale={locale}
-            selectedElementId={selectedElementId}
-            onChange={onChange}
-            onUpdate={onUpdate}
-            onSelectElement={onSelectElement}
-          />
-        )}
+        <ElementTransformControls
+          slide={slide}
+          defaultTextColor={slideColors(theme, slide).fg}
+          device={device}
+          orientation={orientation}
+          locale={locale}
+          selectedElementId={selectedElementId}
+          onChange={onChange}
+          onUpdate={onUpdate}
+          onSelectElement={onSelectElement}
+        />
 
         {isFeatureGraphic && (
-          <div className="space-y-1.5">
-            <Label className="text-xs">App icon</Label>
-            <ScreenshotPicker label="Icon (shared by every banner)" value={appIcon || ""} onChange={onAppIconChange} />
-            <p className="text-[11px] leading-relaxed text-muted-foreground">
-              Shows app icon + name + tagline. Leave the icon blank to use the app&apos;s initial. Name is set in the toolbar.
-            </p>
+          <div className="space-y-3.5 pt-2 border-t">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold">Disposition de la bannière</Label>
+              <Select
+                value={slide.featureLayout || "split"}
+                onValueChange={(val: any) => onChange({ featureLayout: val })}
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="Disposition" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="split">📱 Standard Play Store (Smartphone à droite + Texte)</SelectItem>
+                  <SelectItem value="centered">✨ Centré Majestic (Logo au centre + Halo lumineux)</SelectItem>
+                  <SelectItem value="two-devices">📲 Duo Perspectives (2 Smartphones en vitrine)</SelectItem>
+                  <SelectItem value="minimal">🖋️ Épuré Minimal (Texte + Icône seule)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {(slide.featureLayout === "split" || slide.featureLayout === "two-devices" || !slide.featureLayout) && (
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Capture du smartphone</Label>
+                  <ScreenshotPicker
+                    label="Capture d'écran"
+                    value={slide.screenshot || ""}
+                    locale={locale}
+                    onChange={(v) => onChange({ screenshot: v })}
+                  />
+                </div>
+
+                {slide.featureLayout === "two-devices" && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Seconde capture (fond)</Label>
+                    <ScreenshotPicker
+                      label="Seconde capture"
+                      value={slide.screenshotSecondary || ""}
+                      locale={locale}
+                      onChange={(v) => onChange({ screenshotSecondary: v })}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-1 rounded-md border bg-muted/20 p-2.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <Label className="text-[11px] text-muted-foreground">Taille du smartphone</Label>
+                    <div className="flex items-center gap-1">
+                      {phoneScalePct !== 100 && (
+                        <ResetButton
+                          visible={phoneScalePct !== 100}
+                          label="Réinitialiser la taille à 100%"
+                          onClick={handleResetPhoneScale}
+                        />
+                      )}
+                      <span className="text-[11px] tabular-nums font-mono">{phoneScalePct}%</span>
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    min={50}
+                    max={150}
+                    step={1}
+                    value={phoneScalePct}
+                    onChange={(e) => handlePhoneScaleChange(Number(e.target.value))}
+                    className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-secondary accent-primary"
+                  />
+                </div>
+
+                <div className="space-y-1 rounded-md border bg-muted/20 p-2.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <Label className="text-[11px] text-muted-foreground">Inclinaison du smartphone</Label>
+                    <span className="text-[11px] tabular-nums font-mono">{slide.featureTilt ?? -6}°</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={-18}
+                    max={18}
+                    step={1}
+                    value={slide.featureTilt ?? -6}
+                    onChange={(e) => onChange({ featureTilt: Number(e.target.value) })}
+                    className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-secondary accent-primary"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-1.5 pt-1">
+              <Label className="text-xs font-semibold">Icône de l'application</Label>
+              <ScreenshotPicker label="Icône (partagée avec toutes les bannières)" value={appIcon || ""} onChange={onAppIconChange} />
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                Affichée à côté du nom de l&apos;application. Laissez vide pour utiliser l&apos;initiale.
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -602,9 +721,12 @@ function ElementTransformControls({
         <ActiveElementPanel
           key={activeId}
           activeId={activeId}
+          isFeatureGraphic={isBanner(slide, device)}
           transform={activeTransform}
           textElement={activeTextElement || undefined}
           imageElement={activeImageElement || undefined}
+          captionAlign={slide.captionAlign}
+          onCaptionAlignChange={(align) => onChange({ captionAlign: align })}
           locale={locale}
           canvas={{ cW, cH }}
           defaultTextColor={defaultTextColor}
@@ -640,9 +762,12 @@ function ElementTransformControls({
 
 function ActiveElementPanel({
   activeId,
+  isFeatureGraphic,
   transform,
   textElement,
   imageElement,
+  captionAlign,
+  onCaptionAlignChange,
   locale,
   canvas,
   defaultTextColor,
@@ -656,9 +781,12 @@ function ActiveElementPanel({
   onDeleteImage,
 }: {
   activeId: ElementId;
+  isFeatureGraphic?: boolean;
   transform: ElementTransform | undefined;
   textElement?: TextElement;
   imageElement?: ImageElement;
+  captionAlign?: "left" | "center" | "right";
+  onCaptionAlignChange?: (align: "left" | "center" | "right" | undefined) => void;
   locale: string;
   canvas: { cW: number; cH: number };
   defaultTextColor: string;
@@ -673,7 +801,7 @@ function ActiveElementPanel({
 }) {
   const engaged = !!transform;
   const rotation = transform?.rotation ?? 0;
-  const label = elementLabel(activeId);
+  const label = elementLabel(activeId, isFeatureGraphic);
   return (
     <div className="space-y-2 rounded border bg-background/60 p-2.5">
       <div className="flex items-center justify-between">
@@ -698,6 +826,47 @@ function ActiveElementPanel({
           <span className="text-[10px] text-muted-foreground">drag to enable</span>
         ) : null}
       </div>
+
+      {activeId === "caption" && (
+        <div className="space-y-1 rounded bg-muted/30 p-2">
+          <div className="flex items-center justify-between">
+            <Label className="text-[11px] text-muted-foreground">Alignement du titre</Label>
+            {captionAlign && (
+              <ResetButton
+                visible={!!captionAlign}
+                label="Rétablir l'alignement par défaut"
+                onClick={() => onCaptionAlignChange?.(undefined)}
+              />
+            )}
+          </div>
+          <div className="grid grid-cols-3 gap-1">
+            <LayerButton
+              disabled={false}
+              active={captionAlign === "left"}
+              onClick={() => onCaptionAlignChange?.("left")}
+              label="Aligner à gauche"
+            >
+              <AlignLeft className="h-3.5 w-3.5" />
+            </LayerButton>
+            <LayerButton
+              disabled={false}
+              active={captionAlign === "center" || (!captionAlign && (isFeatureGraphic ? false : true))}
+              onClick={() => onCaptionAlignChange?.("center")}
+              label="Centrer"
+            >
+              <AlignCenter className="h-3.5 w-3.5" />
+            </LayerButton>
+            <LayerButton
+              disabled={false}
+              active={captionAlign === "right"}
+              onClick={() => onCaptionAlignChange?.("right")}
+              label="Aligner à droite"
+            >
+              <AlignRight className="h-3.5 w-3.5" />
+            </LayerButton>
+          </div>
+        </div>
+      )}
 
       {textElement && (
         <TextElementPanel
@@ -1046,11 +1215,16 @@ function TypographySection({
           </Button>
         )}
       </div>
-      {!isFeatureGraphic && (
+      <FontScaleSlider
+        label={isFeatureGraphic ? "Badge" : "Label"}
+        value={scales.labelScale}
+        onChange={(value) => patchTypography({ labelScale: value })}
+      />
+      {isFeatureGraphic && (
         <FontScaleSlider
-          label="Label"
-          value={scales.labelScale}
-          onChange={(value) => patchTypography({ labelScale: value })}
+          label="App icon"
+          value={scales.appIconScale}
+          onChange={(value) => patchTypography({ appIconScale: value })}
         />
       )}
       {isFeatureGraphic && (
@@ -1065,6 +1239,45 @@ function TypographySection({
         value={scales.headlineScale}
         onChange={(value) => patchTypography({ headlineScale: value })}
       />
+
+      <div className="space-y-1.5 pt-2 border-t">
+        <div className="flex items-center justify-between">
+          <Label className="text-[11px] text-muted-foreground">Alignement du texte</Label>
+          {slide.captionAlign && (
+            <ResetButton
+              visible={!!slide.captionAlign}
+              label="Rétablir l'alignement par défaut"
+              onClick={() => onChange({ captionAlign: undefined })}
+            />
+          )}
+        </div>
+        <div className="grid grid-cols-3 gap-1">
+          <LayerButton
+            disabled={false}
+            active={slide.captionAlign === "left"}
+            onClick={() => onChange({ captionAlign: "left" })}
+            label="Aligner à gauche"
+          >
+            <AlignLeft className="h-3.5 w-3.5" />
+          </LayerButton>
+          <LayerButton
+            disabled={false}
+            active={slide.captionAlign === "center" || (!slide.captionAlign && (isFeatureGraphic ? slide.featureLayout === "centered" : true))}
+            onClick={() => onChange({ captionAlign: "center" })}
+            label="Centrer"
+          >
+            <AlignCenter className="h-3.5 w-3.5" />
+          </LayerButton>
+          <LayerButton
+            disabled={false}
+            active={slide.captionAlign === "right"}
+            onClick={() => onChange({ captionAlign: "right" })}
+            label="Aligner à droite"
+          >
+            <AlignRight className="h-3.5 w-3.5" />
+          </LayerButton>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1173,8 +1386,15 @@ function fitToAspect(t: ElementTransform, aspect: number, maxHeight: number): El
   };
 }
 
-function elementLabel(id: ElementId): string {
-  if (isBuiltInElementId(id)) return ELEMENT_LABEL[id];
+function elementLabel(id: ElementId, isFeatureGraphic?: boolean): string {
+  if (isBuiltInElementId(id)) {
+    if (isFeatureGraphic) {
+      if (id === "caption") return "Brand & text";
+      if (id === "device") return "Phone mockup";
+      if (id === "deviceSecondary") return "Back phone";
+    }
+    return ELEMENT_LABEL[id];
+  }
   if (isImageElementId(id)) return "Image";
   return "Text";
 }

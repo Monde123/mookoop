@@ -54,7 +54,7 @@ export function layoutHint(layout: SlideLayout, device: Device): string {
 
 export type Rect = { x: number; y: number; width: number; height: number };
 type LayoutRects = {
-  caption?: Rect & { align?: "center" | "left" };
+  caption?: Rect & { align?: "center" | "left" | "right" };
   device?: Rect;
   deviceSecondary?: Rect;
   callout?: Rect;
@@ -266,18 +266,110 @@ function rectFor(
   id: BuiltInElementId,
   slide: Slide,
   defaults: LayoutRects,
-): (Rect & { align?: "center" | "left" }) | undefined {
+): (Rect & { align?: "center" | "left" | "right" }) | undefined {
   const saved = slide.transforms?.[id];
   const def = defaults[id];
   if (!def && !saved) return undefined;
-  if (!saved) return def;
+  const defAlign = (def as { align?: "center" | "left" | "right" } | undefined)?.align;
+  if (!saved) return def ? { ...def, align: slide.captionAlign ?? defAlign } : undefined;
   return {
     x: saved.x,
     y: saved.y,
     width: saved.width,
     height: saved.height,
-    align: (def as { align?: "center" | "left" } | undefined)?.align,
+    align: slide.captionAlign ?? defAlign,
   };
+}
+
+function getFeatureGraphicRects(
+  slide: Slide,
+  cW: number,
+  cH: number,
+  frameAspect: number,
+): LayoutRects {
+  const layout = slide.featureLayout || "split";
+  const phoneW = cW * 0.23;
+  const phoneH = phoneW / frameAspect;
+
+  switch (layout) {
+    case "split":
+      return {
+        caption: {
+          x: cW * 0.06,
+          y: cH * 0.1,
+          width: cW * 0.53,
+          height: cH * 0.8,
+          align: "left",
+        },
+        device: {
+          x: cW * 0.7,
+          y: Math.max(10, (cH - phoneH) / 2),
+          width: phoneW,
+          height: phoneH,
+        },
+      };
+
+    case "two-devices": {
+      const backW = cW * 0.21;
+      const backH = backW / frameAspect;
+      const frontW = cW * 0.22;
+      const frontH = frontW / frameAspect;
+      return {
+        caption: {
+          x: cW * 0.05,
+          y: cH * 0.1,
+          width: cW * 0.44,
+          height: cH * 0.8,
+          align: "left",
+        },
+        deviceSecondary: {
+          x: cW * 0.75,
+          y: Math.max(15, (cH - backH) / 2 + 10),
+          width: backW,
+          height: backH,
+        },
+        device: {
+          x: cW * 0.62,
+          y: Math.max(10, (cH - frontH) / 2),
+          width: frontW,
+          height: frontH,
+        },
+      };
+    }
+
+    case "centered":
+      return {
+        caption: {
+          x: (cW - cW * 0.68) / 2,
+          y: cH * 0.08,
+          width: cW * 0.68,
+          height: cH * 0.84,
+          align: "center",
+        },
+      };
+
+    case "minimal":
+      return {
+        caption: {
+          x: cW * 0.08,
+          y: cH * 0.12,
+          width: cW * 0.84,
+          height: cH * 0.76,
+          align: "left",
+        },
+      };
+
+    default:
+      return {
+        caption: {
+          x: cW * 0.06,
+          y: cH * 0.1,
+          width: cW * 0.53,
+          height: cH * 0.8,
+          align: "left",
+        },
+      };
+  }
 }
 
 /** Canvas size, frame aspect and every built-in element's default rect for one screen. */
@@ -298,6 +390,10 @@ export function getSlideGeometry(slide: Slide, device: Device, orientation: Orie
     );
     if (slide.callout && defaults.device) defaults.callout = defaultCalloutRect(defaults.device, cW, cH, Math.min(safe.w, safe.h));
     return { cW, cH, frameAspect, defaults, typeUnit: Math.min(safe.w, safe.h) * 1.15 };
+  }
+  if (isFeatureGraphic(slide, device)) {
+    const defaults = getFeatureGraphicRects(slide, cW, cH, frameAspect);
+    return { cW, cH, frameAspect, defaults, typeUnit: cH * 0.8 };
   }
   const fwFrac = widthFn(cW, cH);
   const fwSmallFrac = smallWidthFn(cW, cH);
@@ -342,10 +438,9 @@ export function showsDevice(slide: Slide, device: Device) {
  * any element the user placed (a moved device stays on a "No device" screen).
  * The magnifier needs a device to magnify.
  */
-export function elementRects(slide: Slide, device: Device, orientation: Orientation): Partial<Record<BuiltInElementId, Rect & { align?: "center" | "left" }>> {
-  if (isFeatureGraphic(slide, device)) return {};
+export function elementRects(slide: Slide, device: Device, orientation: Orientation): Partial<Record<BuiltInElementId, Rect & { align?: "center" | "left" | "right" }>> {
   const { defaults } = getSlideGeometry(slide, device, orientation);
-  const rects: Partial<Record<BuiltInElementId, Rect & { align?: "center" | "left" }>> = {};
+  const rects: Partial<Record<BuiltInElementId, Rect & { align?: "center" | "left" | "right" }>> = {};
   for (const id of ["caption", "device", "deviceSecondary"] as const) {
     const rect = rectFor(id, slide, defaults);
     if (rect) rects[id] = rect;
@@ -376,12 +471,19 @@ export function getElementTransform(
   const rect = rectFor(id as BuiltInElementId, slide, defaults);
   if (!rect) return undefined;
   const saved = slide.transforms?.[id as BuiltInElementId];
+  const defaultRotation = isFeatureGraphic(slide, device)
+    ? id === "device"
+      ? (slide.featureTilt ?? -6)
+      : id === "deviceSecondary"
+        ? (slide.featureTilt ?? -6) + 8
+        : 0
+    : 0;
   return {
     x: rect.x,
     y: rect.y,
     width: rect.width,
     height: rect.height,
-    rotation: saved?.rotation ?? 0,
+    rotation: saved?.rotation ?? defaultRotation,
     zIndex: saved?.zIndex ?? defaultElementZ(id as BuiltInElementId),
   };
 }

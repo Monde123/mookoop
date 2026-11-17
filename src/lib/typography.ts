@@ -15,6 +15,7 @@ export function slideFontScales(slide: Slide) {
     labelScale: clampFontScale(slide.typography?.labelScale),
     headlineScale: clampFontScale(slide.typography?.headlineScale),
     appNameScale: clampFontScale(slide.typography?.appNameScale),
+    appIconScale: clampFontScale(slide.typography?.appIconScale),
   };
 }
 
@@ -24,7 +25,7 @@ export function slideFontScales(slide: Slide) {
 export function cleanTypography(raw: SlideTypography | undefined): SlideTypography | undefined {
   if (!raw || typeof raw !== "object") return undefined;
   const out: SlideTypography = {};
-  for (const key of ["labelScale", "headlineScale", "appNameScale"] as const) {
+  for (const key of ["labelScale", "headlineScale", "appNameScale", "appIconScale"] as const) {
     const value = clampFontScale(raw[key]);
     if (value !== FONT_SCALE_DEFAULT) out[key] = value;
   }

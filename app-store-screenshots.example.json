@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 2,
-  "appName": "Mookoop Demo",
-  "themeId": "clean-light",
-  "connectedCanvas": false,
+  "schemaVersion": 3,
+  "appName": "Lumina",
+  "themeId": "minimal-slate",
+  "connectedCanvas": true,
   "locales": ["en", "fr"],
   "locale": "en",
   "device": "android",
@@ -10,29 +10,73 @@
   "slidesByDevice": {
     "android": [
       {
-        "id": "demo-1",
+        "id": "lumina-1",
         "layout": "hero",
         "label": {
-          "en": "WELCOME",
-          "fr": "BIENVENUE"
+          "en": "MEET LUMINA",
+          "fr": "DÉCOUVREZ LUMINA"
         },
         "headline": {
-          "en": "Design stunning\nmockups in seconds",
-          "fr": "Créez de superbes\nmockups en secondes"
+          "en": "Design your workflow\nwith pure clarity.",
+          "fr": "Structurez vos projets\nen toute clarté."
         },
         "screenshot": "",
         "inverted": false
       },
       {
-        "id": "demo-2",
-        "layout": "hero",
+        "id": "lumina-2",
+        "layout": "device-bottom",
         "label": {
-          "en": "EXPORT",
-          "fr": "EXPORTEZ"
+          "en": "SEAMLESS SYNC",
+          "fr": "SYNCHRO INSTANTANÉE"
         },
         "headline": {
-          "en": "Official resolutions\nready for the store",
-          "fr": "Résolutions officielles\nprêtes pour le store"
+          "en": "Real-time sync\nacross every screen.",
+          "fr": "Synchronisation fluide\nsur tous vos appareils."
+        },
+        "screenshot": "",
+        "inverted": false
+      },
+      {
+        "id": "lumina-3",
+        "layout": "two-devices",
+        "label": {
+          "en": "INTELLIGENT AI",
+          "fr": "INTELLIGENCE ARTIFICIELLE"
+        },
+        "headline": {
+          "en": "Actionable insights\nthat keep you ahead.",
+          "fr": "Des recommandations\nqui anticipent vos besoins."
+        },
+        "screenshot": "",
+        "inverted": false
+      },
+      {
+        "id": "lumina-4",
+        "layout": "device-top",
+        "label": {
+          "en": "COLLABORATION",
+          "fr": "TRAVAIL EN ÉQUIPE"
+        },
+        "headline": {
+          "en": "Export, share and\nship together.",
+          "fr": "Partagez et exportez\nen un seul clic."
+        },
+        "screenshot": "",
+        "inverted": true
+      }
+    ],
+    "feature-graphic": [
+      {
+        "id": "lumina-fg",
+        "layout": "feature-graphic",
+        "label": {
+          "en": "SMART WORKSPACE",
+          "fr": "ESPACE DE TRAVAIL INTELLIGENT"
+        },
+        "headline": {
+          "en": "The Intelligent Workspace",
+          "fr": "L'Espace de Travail Intelligent"
         },
         "screenshot": "",
         "inverted": false

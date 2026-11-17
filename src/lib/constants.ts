@@ -1,8 +1,8 @@
 import type { ImportedFont, ScreenshotFontId, Theme, ThemeId } from "./types";
 
-export const DEFAULT_THEME_ID: ThemeId = "deaftranslator-signature";
+export const DEFAULT_THEME_ID: ThemeId = "minimal-slate";
 
-export const DEFAULT_SCREENSHOT_FONT_ID: ScreenshotFontId = "lato";
+export const DEFAULT_SCREENSHOT_FONT_ID: ScreenshotFontId = "template-default";
 
 // Family used for a font imported through the toolbar. The matching @font-face
 // is injected into <head> by the editor (see screenshot-editor.tsx), so it sits
@@ -10,14 +10,12 @@ export const DEFAULT_SCREENSHOT_FONT_ID: ScreenshotFontId = "lato";
 export const IMPORTED_FONT_FAMILY = "ImportedScreenshotFont";
 
 export const SCREENSHOT_FONTS: Record<ScreenshotFontId, { name: string; family: string }> = {
-  "lato": { name: "Lato (Charte deafTranslator)", family: 'var(--font-lato), "Lato", -apple-system, sans-serif' },
-  // Inherit the editor's Inter (next/font in app/layout.tsx), which is what the
-  // canvas rendered before fonts were selectable, so existing decks don't shift.
   "template-default": { name: "Inter (default)", family: "inherit" },
   "system-sans": {
     name: "System Sans",
     family: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
   },
+  "lato": { name: "Lato", family: 'var(--font-lato), "Lato", -apple-system, sans-serif' },
   "template-serif": { name: "Georgia", family: "Georgia, 'Times New Roman', serif" },
   // Named system fonts ship with macOS; elsewhere they fall back to the listed
   // alternatives, so export on the machine whose fonts you designed with.
@@ -43,15 +41,25 @@ export function screenshotFontFamily(fontId: ScreenshotFontId | undefined): stri
 }
 
 export const THEMES: Record<string, Theme> = {
-  "deaftranslator-signature": {
-    id: "deaftranslator-signature",
-    name: "deafTranslator Signature",
-    bg: "#EEF3FA",
-    bgAlt: "#0F2137",
-    fg: "#0F2137",
-    fgAlt: "#FFFFFF",
-    accent: "#244886",
+  "minimal-slate": {
+    id: "minimal-slate",
+    name: "Minimal Slate",
+    bg: "#F8FAFC",
+    bgAlt: "#0F172A",
+    fg: "#0F172A",
+    fgAlt: "#F8FAFC",
+    accent: "#4F46E5",
     muted: "#64748B",
+  },
+  "obsidian-dark": {
+    id: "obsidian-dark",
+    name: "Obsidian Dark",
+    bg: "#090D16",
+    bgAlt: "#F8FAFC",
+    fg: "#F8FAFC",
+    fgAlt: "#090D16",
+    accent: "#6366F1",
+    muted: "#94A3B8",
   },
   "clean-light": {
     id: "clean-light",
@@ -60,8 +68,28 @@ export const THEMES: Record<string, Theme> = {
     bgAlt: "#171717",
     fg: "#171717",
     fgAlt: "#F6F1EA",
-    accent: "#5B7CFA",
+    accent: "#0071E3",
     muted: "#6B7280",
+  },
+  "universal-azure": {
+    id: "universal-azure",
+    name: "Universal Azure",
+    bg: "#F0F7FF",
+    bgAlt: "#0C2340",
+    fg: "#0C2340",
+    fgAlt: "#F0F7FF",
+    accent: "#0284C7",
+    muted: "#475569",
+  },
+  "nordic-navy": {
+    id: "nordic-navy",
+    name: "Nordic Navy",
+    bg: "#EEF3FA",
+    bgAlt: "#0F2137",
+    fg: "#0F2137",
+    fgAlt: "#FFFFFF",
+    accent: "#244886",
+    muted: "#64748B",
   },
   "dark-bold": {
     id: "dark-bold",
@@ -306,10 +334,12 @@ export const THEMES: Record<string, Theme> = {
 };
 
 export function themeById(themeId: string | undefined): Theme {
+  if (themeId === "deaftranslator-signature") return THEMES["nordic-navy"];
   return THEMES[themeId || ""] || THEMES[DEFAULT_THEME_ID];
 }
 
 export function hasTheme(themeId: string | undefined): boolean {
+  if (themeId === "deaftranslator-signature") return true;
   return !!themeId && !!THEMES[themeId];
 }
 

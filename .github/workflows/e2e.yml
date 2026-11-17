@@ -1,12 +1,16 @@
 name: Editor verification
+
 on:
   pull_request:
   push:
     branches: [main]
+
 permissions:
   contents: read
+
 jobs:
-  chrome:
+  validate:
+    name: Quick CI (Typecheck & Build)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,8 +21,24 @@ jobs:
         with:
           bun-version: 1.3.9
       - run: bun install
-      - run: npx playwright install chrome --with-deps
       - run: bun run typecheck
+      - run: bun run build
+
+  e2e:
+    name: End-to-End Suite (Chrome)
+    needs: validate
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.9
+      - run: bun install
+      - run: npx playwright install chrome --with-deps
       - run: bun run build
       - run: bun run test:e2e
       - run: SCREENSHOTS_E2E_PRODUCTION=1 bun run test:e2e

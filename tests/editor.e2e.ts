@@ -149,12 +149,15 @@ test('real disk autosave reload and cache preserve edits', async ({ app, browser
 test('keyboard screen reorder keeps the selected screen and has a separate undo step', async ({ app, browser, screen }) => {
   await mock(browser); await app.open('/');
   const handle = screen.getByRole('button', 'Reorder screen 1 (press space, then arrow keys)', { exact: true });
+  await handle.focus();
   await handle.press('Space');
   await expect(handle).toHaveAttribute('aria-pressed', 'true');
   await expect(screen.getByRole('status')).toContainText(/First was (picked up|moved over droppable area First)/);
+  await browser.evaluate(() => new Promise(resolve => setTimeout(resolve, 150)));
   await browser.keyboard.press('ArrowDown');
   await expect(screen.getByRole('status')).toContainText('over droppable area Second');
   await browser.keyboard.press('Space');
+  await browser.evaluate(() => new Promise(resolve => setTimeout(resolve, 300)));
   await expect(screen.getByRole('button', /Screen 1 ·.*Second/)).toBeVisible();
   await expect(screen.getByRole('textbox', 'Headline')).toHaveValue('First');
   await browser.locator('button[aria-label="Undo"]').tap();

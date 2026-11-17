@@ -170,18 +170,18 @@ export function Inspector({
   }
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="border-b p-3">
+    <div className="flex h-full flex-col bg-white">
+      <div className="border-b border-border/80 px-4 py-3 bg-white">
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="text-sm font-semibold">Screen settings</h2>
-          <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+          <h2 className="text-sm font-semibold tracking-tight text-[#101010]">Screen settings</h2>
+          <span className="text-[10px] uppercase font-bold tracking-wider text-[#6e6e73]">
             editing · {locale.toUpperCase()}
           </span>
         </div>
-        <p className="text-xs text-muted-foreground">{layoutHint(slide.layout, device)}</p>
+        <p className="text-xs text-[#6e6e73] mt-0.5">{layoutHint(slide.layout, device)}</p>
       </div>
 
-      <div className="flex-1 space-y-4 overflow-y-auto p-3">
+      <div className="flex-1 space-y-4 overflow-y-auto px-4 py-3.5 custom-scrollbar">
         <div className="space-y-1.5">
           <Label className="text-xs">Layout</Label>
           <Select
@@ -803,11 +803,11 @@ function ActiveElementPanel({
   const rotation = transform?.rotation ?? 0;
   const label = elementLabel(activeId, isFeatureGraphic);
   return (
-    <div className="space-y-2 rounded border bg-background/60 p-2.5">
+    <div className="space-y-2.5 rounded-xl border border-border/80 bg-[#fbfbfd] p-3">
       <div className="flex items-center justify-between">
-        <span className="flex items-center gap-1 text-xs font-medium">
-          {textElement && <Type className="h-3.5 w-3.5" />}
-          {imageElement && <ImagePlus className="h-3.5 w-3.5" />}
+        <span className="flex items-center gap-1.5 text-xs font-semibold text-[#101010]">
+          {textElement && <Type className="h-3.5 w-3.5 text-[#0088ff]" />}
+          {imageElement && <ImagePlus className="h-3.5 w-3.5 text-[#0088ff]" />}
           {label}
         </span>
         {textElement || imageElement ? (
@@ -828,9 +828,9 @@ function ActiveElementPanel({
       </div>
 
       {activeId === "caption" && (
-        <div className="space-y-1 rounded bg-muted/30 p-2">
+        <div className="space-y-1.5 rounded-lg border border-border/60 bg-white p-2">
           <div className="flex items-center justify-between">
-            <Label className="text-[11px] text-muted-foreground">Alignement du titre</Label>
+            <Label className="text-[11px] font-medium text-muted-foreground">Alignement du titre</Label>
             {captionAlign && (
               <ResetButton
                 visible={!!captionAlign}
@@ -1162,7 +1162,10 @@ function LayerButton({
       type="button"
       variant="outline"
       size="sm"
-      className={cn("h-7 px-0", active && "border-foreground/40 bg-accent text-accent-foreground")}
+      className={cn(
+        "h-7 rounded-lg px-0 transition-colors border-border/80 text-muted-foreground",
+        active && "border-[#0088ff] bg-[#0088ff]/10 text-[#0088ff] font-semibold"
+      )}
       disabled={disabled}
       aria-pressed={active}
       onClick={onClick}
@@ -1182,7 +1185,7 @@ function TypographySection({
   slide: Slide;
   isFeatureGraphic: boolean;
   onChange: (patch: Partial<Slide>) => void;
-}) {
+  }) {
   const scales = slideFontScales(slide);
   const customized = !!cleanTypography(slide.typography);
 
@@ -1193,7 +1196,7 @@ function TypographySection({
   }
 
   return (
-    <div className="space-y-3 rounded-md border bg-muted/30 p-3">
+    <div className="space-y-3 rounded-xl border border-border/80 bg-[#fbfbfd] p-3">
       <div className="flex items-start justify-between gap-2">
         <div>
           <Label className="text-xs font-semibold">Text size</Label>

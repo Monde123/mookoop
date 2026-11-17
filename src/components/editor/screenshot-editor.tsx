@@ -646,7 +646,7 @@ export function ScreenshotEditor() {
       />
 
       <div inert={busy} aria-busy={busy} className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
-        <aside className="lg:w-72 w-full shrink-0 border-r bg-card lg:max-h-none max-h-64 overflow-hidden">
+        <aside className="lg:w-72 w-full shrink-0 border-r border-border/80 bg-white lg:max-h-none max-h-64 overflow-hidden">
           <Sidebar
             slides={currentSlides}
             activeId={activeSlide?.id || null}
@@ -698,7 +698,7 @@ export function ScreenshotEditor() {
           )}
         </main>
 
-        <aside className="lg:w-80 w-full shrink-0 border-l bg-card lg:max-h-none max-h-96 overflow-hidden">
+        <aside className="lg:w-80 w-full shrink-0 border-l border-border/80 bg-white lg:max-h-none max-h-96 overflow-hidden">
           {activeSlide ? (
             <Inspector
               key={`${state.device}:${activeSlide.id}`}

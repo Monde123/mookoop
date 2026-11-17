@@ -90,22 +90,26 @@ export function PreviewStage({
     setZoom(1);
   }, [device, orientation]);
 
-  const panToActiveScreen = React.useCallback((nextScale: number) => {
+  const panToActiveScreen = React.useCallback((nextScale: number, smooth = true) => {
     const scroller = scrollerRef.current;
     if (!scroller || !activeId) return;
     const screenLeft = activeIndex * cW * nextScale;
     const screenWidth = cW * nextScale;
     const targetLeft = Math.max(0, screenLeft - (scroller.clientWidth - screenWidth) / 2);
-    scroller.scrollTo({ left: targetLeft, behavior: "smooth" });
+    scroller.scrollTo({ left: targetLeft, behavior: smooth ? "smooth" : "auto" });
   }, [activeIndex, activeId, cW]);
 
+  const lastActiveIdRef = React.useRef(activeId);
   React.useEffect(() => {
-    if (suppressNextActiveScreenPanRef.current) {
-      suppressNextActiveScreenPanRef.current = false;
-      return;
+    if (lastActiveIdRef.current !== activeId) {
+      lastActiveIdRef.current = activeId;
+      if (suppressNextActiveScreenPanRef.current) {
+        suppressNextActiveScreenPanRef.current = false;
+        return;
+      }
+      panToActiveScreen(scale, true);
     }
-    panToActiveScreen(scale);
-  }, [panToActiveScreen, scale]);
+  }, [activeId, panToActiveScreen, scale]);
 
   const handleCanvasActiveSlideChange = React.useCallback(
     (id: string) => {
@@ -117,19 +121,37 @@ export function PreviewStage({
     [activeSlideId, onActiveSlideChange],
   );
 
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    // Zoom on Ctrl / Cmd + wheel or trackpad pinch
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+      setZoom((z) => Math.min(2.5, Math.max(0.2, Math.round(z * zoomFactor * 100) / 100)));
+      return;
+    }
+    // Convert vertical wheel to horizontal panning on scroller
+    if (scrollerRef.current && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      scrollerRef.current.scrollLeft += e.deltaY;
+    }
+  };
+
   return (
     <div
       ref={containerRef}
-      className="relative h-full w-full overflow-hidden bg-[radial-gradient(70%_70%_at_50%_35%,_hsl(var(--background))_0%,_hsl(var(--muted))_100%)]"
+      className="relative h-full w-full overflow-hidden bg-[#f5f5f7] select-none"
     >
-      <div ref={scrollerRef} className="h-full w-full overflow-auto p-12">
+      <div
+        ref={scrollerRef}
+        onWheel={handleWheel}
+        className="h-full w-full overflow-auto p-12 custom-scrollbar"
+      >
         <div
           style={{
             width: totalW * scale,
             height: cH * scale,
             position: "relative",
             flexShrink: 0,
-            filter: "drop-shadow(0 32px 42px rgba(15, 23, 42, 0.18))",
+            filter: "drop-shadow(0 24px 60px rgba(16, 16, 16, 0.12))",
           }}
         >
           <div
@@ -169,8 +191,8 @@ export function PreviewStage({
         </div>
       </div>
 
-      <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-1.5 rounded-md bg-background/80 px-2 py-1 text-[11px] text-muted-foreground shadow-sm backdrop-blur">
-        <span className="font-medium text-foreground">{DEVICES[device].label}</span>
+      <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs text-[#6e6e73] shadow-sm backdrop-blur border border-[#e5e5ea]">
+        <span className="font-semibold text-[#101010]">{DEVICES[device].label}</span>
         {activeSlide && (
           <>
             <span aria-hidden>·</span>
@@ -209,14 +231,14 @@ export function PreviewStage({
         />
       )}
 
-      <div className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-md bg-background/85 px-1.5 py-1 text-[10px] tabular-nums text-muted-foreground shadow-sm backdrop-blur">
-        <span className="px-1">{slides.length}× {cW}×{cH}</span>
-        <span aria-hidden className="text-border">|</span>
+      <div className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs tabular-nums text-[#6e6e73] shadow-sm backdrop-blur border border-[#e5e5ea]">
+        <span className="px-1 text-[11px] font-mono">{slides.length}× {cW}×{cH}</span>
+        <span aria-hidden className="text-[#e5e5ea]">|</span>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="h-6 w-6"
+          className="h-6 w-6 rounded-full hover:bg-[#f5f5f7] text-[#101010]"
           onClick={() => setZoom((value) => Math.max(0.25, Number((value - 0.1).toFixed(2))))}
           disabled={zoom <= 0.25}
           title="Zoom out"
@@ -224,12 +246,12 @@ export function PreviewStage({
         >
           <ZoomOut className="h-3.5 w-3.5" />
         </Button>
-        <span className="min-w-10 text-center">{(scale * 100).toFixed(0)}%</span>
+        <span className="min-w-10 text-center font-medium text-[#101010]">{(scale * 100).toFixed(0)}%</span>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="h-6 w-6"
+          className="h-6 w-6 rounded-full hover:bg-[#f5f5f7] text-[#101010]"
           onClick={() => setZoom((value) => Math.min(2, Number((value + 0.1).toFixed(2))))}
           disabled={zoom >= 2}
           title="Zoom in"
@@ -241,10 +263,10 @@ export function PreviewStage({
           type="button"
           variant="ghost"
           size="icon"
-          className="h-6 w-6"
+          className="h-6 w-6 rounded-full hover:bg-[#f5f5f7] text-[#101010]"
           onClick={() => {
             setZoom(1);
-            panToActiveScreen(fitScale);
+            panToActiveScreen(fitScale, true);
           }}
           title="Fit active screen"
           aria-label="Fit active screen"

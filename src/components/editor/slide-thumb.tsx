@@ -75,8 +75,8 @@ export function SlideThumb({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative flex items-stretch gap-2 rounded-lg border bg-card p-1.5 transition-all hover:border-foreground/30 hover:bg-accent",
-        active && "border-primary ring-1 ring-primary",
+        "group relative flex items-stretch gap-2.5 rounded-[14px] border border-[#e5e5ea] bg-white p-2 transition-all hover:border-[#ababb0] hover:bg-[#f5f5f7]/60 shadow-[0_1px_3px_rgba(16,16,16,0.02)]",
+        active && "border-[#0088ff] ring-2 ring-[#0088ff]/25 bg-[#f5f5f7] shadow-sm",
       )}
     >
       <button

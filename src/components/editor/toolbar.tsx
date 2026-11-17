@@ -104,21 +104,29 @@ export function Toolbar(props: Props) {
     id === "self-hosted" && props.importedFont?.name ? props.importedFont.name : SCREENSHOT_FONTS[id].name;
 
   return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-b bg-card/40 px-4 py-2">
-      <div className="flex items-center gap-1.5 mr-1 shrink-0">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-[#f0f0f0] bg-[#ffffff] px-4 py-2.5 shadow-[0_1px_3px_rgba(16,16,16,0.03)] z-30">
+      <div className="flex items-center gap-2 mr-1 shrink-0">
         <a
           href="/"
-          className="flex items-center gap-1.5 hover:opacity-85 transition-opacity"
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
           title="Retour à la page d'accueil"
         >
-          <MookoopLogo size={28} />
-          <span className="text-xs font-bold text-foreground hidden sm:inline">mookoop</span>
+          <div
+            className="w-7 h-7 rounded-[7px] flex items-center justify-center shadow-sm shrink-0"
+            style={{
+              background:
+                "linear-gradient(0deg, rgb(240, 100, 19) -29.375%, rgb(254, 171, 48) 100%)",
+            }}
+          >
+            <div className="w-3 h-3 bg-white rounded-[2px]" />
+          </div>
+          <span className="text-xs font-bold text-[#101010] hidden sm:inline tracking-tight">mookoop</span>
         </a>
       </div>
 
       <a
         href="/"
-        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mr-1 px-2 py-1.5 rounded-[8px] hover:bg-muted/80 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6e6e73] hover:text-[#101010] px-2.5 py-1 rounded-full hover:bg-[#f5f5f7] transition-colors mr-1"
         title="Retourner à la page d'accueil"
       >
         <Home className="h-3.5 w-3.5" />
@@ -129,12 +137,12 @@ export function Toolbar(props: Props) {
         type="button"
         variant="outline"
         size="sm"
-        className="h-8 gap-1.5 px-2.5 text-xs font-semibold text-indigo-400 border-indigo-500/30 hover:text-indigo-300 hover:bg-indigo-950/40 hover:border-indigo-500/60 transition-colors"
+        className="h-8 gap-1.5 px-3 rounded-full text-xs font-semibold text-[#f06413] bg-[#f06413]/10 border-[#f06413]/25 hover:bg-[#f06413]/20 hover:text-[#ea580c] transition-all"
         onClick={() => setDemosOpen(true)}
         disabled={props.busy}
         title="Explorer les modèles et démos universelles"
       >
-        <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
+        <Sparkles className="h-3.5 w-3.5 text-[#f06413]" />
         <span>Modèles</span>
       </Button>
 
@@ -143,7 +151,7 @@ export function Toolbar(props: Props) {
       <Input
         value={props.appName}
         onChange={(e) => props.setAppName(e.target.value)}
-        className="h-8 w-36 border-dashed text-sm font-semibold focus-visible:border-input focus-visible:border-solid focus-visible:bg-background"
+        className="h-8 w-36 rounded-full bg-[#f5f5f7] border border-[#e5e5ea] px-3.5 text-xs font-semibold text-[#101010] focus-visible:bg-white focus-visible:border-[#0088ff] focus-visible:ring-1 focus-visible:ring-[#0088ff]"
         placeholder="App name"
         aria-label="App name"
         title="App name (click to edit)"
@@ -239,9 +247,14 @@ export function Toolbar(props: Props) {
           props.setDevice(next);
         }}
       >
-        <TabsList className="h-8 p-0.5">
+        <TabsList className="h-8 p-1 bg-[#f5f5f7] rounded-full border border-[#e5e5ea]/60">
           {PLATFORMS.map(({ id, label }) => (
-            <TabsTrigger key={id} value={id} className="h-7 px-3 text-xs" disabled={props.busy}>
+            <TabsTrigger
+              key={id}
+              value={id}
+              className="h-6 px-3 text-xs rounded-full data-[state=active]:bg-white data-[state=active]:text-[#101010] data-[state=active]:shadow-sm font-medium transition-all"
+              disabled={props.busy}
+            >
               {label}
             </TabsTrigger>
           ))}
@@ -300,63 +313,67 @@ export function Toolbar(props: Props) {
         </Select>
       )}
 
-      <div className="ml-auto flex shrink-0 items-center gap-2">
+      <div className="ml-auto flex shrink-0 items-center gap-2.5">
         <SaveStatus savedAt={props.savedAt} saveError={props.saveError} />
         {props.saveError && props.onRetrySave && (
           <Button variant="ghost" size="sm" disabled={props.busy} onClick={props.onRetrySave}>Retry save</Button>
         )}
-        <span aria-hidden className="h-5 w-px bg-border" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={props.onUndo}
-          title="Undo (⌘Z)"
-          aria-label="Undo"
-          disabled={props.busy || !props.canUndo}
-        >
-          <Undo2 className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={props.onRedo}
-          title="Redo (⌘⇧Z)"
-          aria-label="Redo"
-          disabled={props.busy || !props.canRedo}
-        >
-          <Redo2 className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={() => setResetOpen(true)}
-          title="Reset screens to defaults"
-          aria-label="Reset"
-          disabled={props.busy}
-        >
-          <RotateCcw className="h-4 w-4" />
-        </Button>
+        
+        <div className="flex items-center bg-[#f5f5f7] rounded-full p-0.5 border border-[#e5e5ea]">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 rounded-full text-[#6e6e73] hover:text-[#101010] hover:bg-white transition-all"
+            onClick={props.onUndo}
+            title="Undo (⌘Z)"
+            aria-label="Undo"
+            disabled={props.busy || !props.canUndo}
+          >
+            <Undo2 className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 rounded-full text-[#6e6e73] hover:text-[#101010] hover:bg-white transition-all"
+            onClick={props.onRedo}
+            title="Redo (⌘⇧Z)"
+            aria-label="Redo"
+            disabled={props.busy || !props.canRedo}
+          >
+            <Redo2 className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 rounded-full text-[#6e6e73] hover:text-[#101010] hover:bg-white transition-all"
+            onClick={() => setResetOpen(true)}
+            title="Reset screens to defaults"
+            aria-label="Reset"
+            disabled={props.busy}
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+
         <Button
           variant="outline"
           onClick={props.onDownloadSingle}
           disabled={!!props.exporting || importingFont}
           size="sm"
-          className="h-8 gap-1.5 px-2.5 text-xs font-medium"
+          className="h-8 gap-1.5 px-3.5 rounded-full text-xs font-medium border-[#d0d0d3] hover:bg-[#f5f5f7] text-[#101010] transition-colors"
           title="Télécharger immédiatement cet écran en PNG haute résolution"
         >
           <Download className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">Télécharger (PNG)</span>
         </Button>
+
         <Button
           onClick={props.onExport}
           disabled={!!props.exporting || importingFont}
           size="sm"
-          className="h-8 gap-1.5 px-3 text-xs"
+          className="h-8 gap-1.5 px-4 rounded-full text-xs font-semibold bg-[#0088ff] hover:bg-[#1c95ff] text-white shadow-sm transition-all active:scale-[0.98]"
           title="Exporter tous les écrans et toutes les résolutions dans une archive ZIP"
         >
           <Archive className="h-3.5 w-3.5" />

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Mulish:wght@400..800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -126,4 +128,27 @@
 .rnd-editable [contenteditable]:focus {
   box-shadow: 0 0 0 2px rgba(91, 124, 250, 0.45);
   border-radius: 2px;
+}
+
+/* Readwise Style Reference Tokens & Highlighting */
+:root {
+  --font-charter: 'Lora', 'Charter', 'Source Serif Pro', Georgia, serif;
+  --font-mulish: 'Mulish', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-pen-blue: #478cd0;
+  --color-highlighter-yellow: #fff7ca;
+  --color-reader-orange: #fb9100;
+  --color-paper-white: #ffffff;
+  --color-ink: #1f1f1f;
+  --color-page-mist: #f1f5f8;
+  --color-deep-slate: #2d2f33;
+  --color-true-black: #000000;
+}
+
+.highlight-wash {
+  background-color: #fff7ca;
+  color: #1f1f1f;
+  padding: 1px 4px;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }

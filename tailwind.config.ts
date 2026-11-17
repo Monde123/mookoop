@@ -7,7 +7,21 @@ const config: Config = {
   theme: {
     container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
     extend: {
+      fontFamily: {
+        charter: ["var(--font-charter)", "Charter", "Source Serif Pro", "Lora", "Georgia", "serif"],
+        mulish: ["var(--font-mulish)", "Mulish", "Inter", "system-ui", "sans-serif"],
+      },
       colors: {
+        readwise: {
+          blue: "#478cd0",
+          yellow: "#fff7ca",
+          orange: "#fb9100",
+          mist: "#f1f5f8",
+          ink: "#1f1f1f",
+          slate: "#2d2f33",
+          paper: "#ffffff",
+          border: "#e2e8f0",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

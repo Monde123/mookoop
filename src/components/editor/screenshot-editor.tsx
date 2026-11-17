@@ -21,6 +21,7 @@ import { Sidebar } from "./sidebar";
 import { DeckCanvas } from "./slide-canvas";
 import { StyleLab } from "./style-lab";
 import { Toolbar } from "./toolbar";
+import { DEMO_PACKS, type DemoPreset } from "@/lib/demos";
 
 export function ScreenshotEditor() {
   const { state, setState, hydrated, savedAt, saveError, retrySave, reset, resetDevice, undo, redo, canUndo, canRedo } = useProject();
@@ -80,6 +81,25 @@ export function ScreenshotEditor() {
       });
     }
   }, [hydrated, state.themeId]);
+
+  const demoChecked = React.useRef(false);
+  React.useEffect(() => {
+    if (!hydrated || demoChecked.current) return;
+    demoChecked.current = true;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const demoId = params.get("demo");
+      if (demoId) {
+        const match = DEMO_PACKS.find((p: DemoPreset) => p.id === demoId);
+        if (match) {
+          setState(match.state, { coalesce: false });
+          toast.success(`Modèle "${match.name}" chargé depuis l'accueil`);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, [hydrated, setState]);
 
   // Recomputed every render: the open deck's bezels are known once frames load.
   const assetPaths = preloadPaths(state);

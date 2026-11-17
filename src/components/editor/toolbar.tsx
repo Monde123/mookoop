@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { AlertTriangle, Archive, Check, Cloud, Download, FlaskConical, Redo2, RotateCcw, Sparkles, Undo2, UnfoldHorizontal, Upload } from "lucide-react";
+import { AlertTriangle, Archive, Check, Cloud, Download, FlaskConical, Home, Redo2, RotateCcw, Sparkles, Undo2, UnfoldHorizontal, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MookoopLogo } from "@/components/brand/logo";
 import { DemosDialog } from "./demos-dialog";
@@ -106,8 +106,24 @@ export function Toolbar(props: Props) {
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-b bg-card/40 px-4 py-2">
       <div className="flex items-center gap-1.5 mr-1 shrink-0">
-        <MookoopLogo size={28} />
+        <a
+          href="/"
+          className="flex items-center gap-1.5 hover:opacity-85 transition-opacity"
+          title="Retour à la page d'accueil"
+        >
+          <MookoopLogo size={28} />
+          <span className="text-xs font-bold text-foreground hidden sm:inline">mookoop</span>
+        </a>
       </div>
+
+      <a
+        href="/"
+        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mr-1 px-2 py-1.5 rounded-[8px] hover:bg-muted/80 transition-colors"
+        title="Retourner à la page d'accueil"
+      >
+        <Home className="h-3.5 w-3.5" />
+        <span className="hidden md:inline">Accueil</span>
+      </a>
 
       <Button
         type="button"

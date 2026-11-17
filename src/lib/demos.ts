@@ -12,6 +12,8 @@ export type DemoPreset = {
   state: ProjectState;
 };
 
+export type DemoPresetId = string;
+
 const t = (enText: string, frText: string) => ({
   en: enText,
   fr: frText,
@@ -390,3 +392,5 @@ export const DEMO_PRESETS: DemoPreset[] = [
     },
   },
 ];
+
+export const DEMO_PACKS = DEMO_PRESETS;

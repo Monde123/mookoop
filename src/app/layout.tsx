@@ -10,8 +10,8 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: "mookoop — Universal App Store & Play Store Screenshot Studio",
-  description: "Universal open-source studio to craft official mockups and store banners for iOS and Android.",
+  title: "mookoop — Studio Open-Source de Mockups App Store & Google Play",
+  description: "Concevez, personnalisez et exportez vos captures d'écran officielles et bannières Feature Graphic pour iOS et Android.",
   icons: {
     icon: "/icon.svg",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={lato.variable}>
+    <html lang="fr" className={lato.variable}>
       <body className={`${inter.className} ${lato.className}`}>{children}</body>
     </html>
   );

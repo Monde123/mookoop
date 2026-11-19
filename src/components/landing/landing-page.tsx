@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { MookoopLogo } from "@/components/brand/logo";
 import { DEMO_PACKS, type DemoPreset, type DemoPresetId } from "@/lib/demos";
+import { DemosShowcase } from "./demos-showcase";
 import { useI18n } from "@/lib/i18n";
 import {
   ArrowRight,
@@ -181,12 +182,13 @@ export function LandingPage({ onOpenStudio }: LandingPageProps) {
             style={{ boxShadow: "rgba(16, 16, 16, 0.08) 0px 20px 60px 0px" }}
           >
             <div className="flex flex-col lg:flex-row items-center justify-center gap-8 relative">
-              {/* iPhone 16 Pro Max Mockup */}
-              <div className="w-[280px] sm:w-[320px] rounded-[44px] bg-[#0A0A0C] p-3 shadow-2xl border-4 border-[#27272A] relative transform hover:scale-[1.02] transition-transform">
+              {/* iPhone 16 Pro Max Mockup with Natural Floating Levitation */}
+              <div className="w-[280px] sm:w-[320px] rounded-[44px] bg-[#0A0A0C] p-3 shadow-2xl border-4 border-[#27272A] relative transform animate-float-subtle hover:scale-[1.02] transition-transform">
                 <div className="absolute top-6 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-20 flex items-center justify-center">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#111] ml-auto mr-3" />
                 </div>
-                <div className="rounded-[34px] overflow-hidden bg-black aspect-[9/19.5]">
+                <div className="rounded-[34px] overflow-hidden bg-black aspect-[9/19.5] relative">
+                  <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-tr from-transparent via-white/[0.04] to-white/[0.09]" />
                   <img
                     src="/screenshots/demos/novapay.png"
                     alt="NovaPay Fintech Interface"
@@ -198,8 +200,8 @@ export function LandingPage({ onOpenStudio }: LandingPageProps) {
                 </div>
               </div>
 
-              {/* Google Play Feature Graphic Banner */}
-              <div className="w-full lg:w-[600px] flex flex-col gap-4">
+              {/* Google Play Feature Graphic Banner with Gentle Float */}
+              <div className="w-full lg:w-[600px] flex flex-col gap-4 animate-float-opposite">
                 <div className="rounded-[20px] overflow-hidden border border-[#e2e8f0] bg-gradient-to-br from-[#0F172A] to-[#020617] p-6 text-white shadow-xl relative">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[12px] font-bold tracking-wider text-[#A78BFA] bg-[#1E1B4B] px-3 py-1 rounded-full border border-[#6366F1]/40">
@@ -376,87 +378,8 @@ export function LandingPage({ onOpenStudio }: LandingPageProps) {
         </div>
       </section>
 
-      {/* 5. VITRINE DES 6 DÉMOS RÉELLES */}
-      <section id="demos" className="py-24 px-6 max-w-[1200px] mx-auto">
-        <div className="text-center max-w-[800px] mx-auto mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f5f5f7] text-[12px] font-semibold text-[#6e6e73] mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-[#f06413]" />
-            <span>{t.demos.badge}</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-[46px] font-bold text-[#101010] tracking-[-0.7px] mb-4">
-            {t.demos.title}
-          </h2>
-          <p className="text-[17px] text-[#6e6e73] leading-relaxed">
-            {t.demos.subtitle}
-          </p>
-        </div>
-
-        {/* Grid of the 6 Real Presets */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {DEMO_PACKS.map((demo: DemoPreset) => {
-            const loc = t.demos.presets[demo.id] || {
-              name: demo.name,
-              category: demo.category,
-              badge: demo.badge,
-              description: demo.description,
-            };
-
-            return (
-              <div
-                key={demo.id}
-                className="bg-white rounded-[20px] border border-[#e2e8f0] overflow-hidden flex flex-col justify-between hover:translate-y-[-4px] transition-all"
-                style={{ boxShadow: "rgba(16, 16, 16, 0.06) 0px 10px 30px 0px" }}
-              >
-                {/* Screenshot Preview Card */}
-                <div className="p-6 bg-[#f5f5f7] border-b border-[#f0f0f0] flex flex-col items-center">
-                  <div className="w-[140px] rounded-[22px] bg-[#111] p-1.5 shadow-md border border-[#333]">
-                    <div className="rounded-[16px] overflow-hidden aspect-[9/19.5] bg-black">
-                      <img
-                        src={demo.screenshot || "/screenshots/demos/novapay.png"}
-                        alt={loc.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[12px] font-semibold text-[#6e6e73] bg-[#f5f5f7] px-2.5 py-0.5 rounded-full">
-                        {loc.category}
-                      </span>
-                      <span className="text-[11px] font-bold text-[#f06413] bg-[#f06413]/10 px-2.5 py-0.5 rounded-full">
-                        {loc.badge}
-                      </span>
-                    </div>
-
-                    <h3 className="font-bold text-xl text-[#101010] mb-2">{loc.name}</h3>
-                    <p className="text-xs text-[#6e6e73] leading-relaxed mb-4">
-                      {loc.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-4 border-t border-[#f0f0f0] flex items-center justify-between">
-                    <span className="text-[12px] font-mono text-[#ababb0]">
-                      {t.demos.themeLabel}: {demo.themeId}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => onOpenStudio(demo.id)}
-                      className="bg-[#0088ff] hover:bg-[#1c95ff] text-white text-[13px] font-semibold px-4 py-2 rounded-full transition-all flex items-center gap-1 active:scale-[0.98] cursor-pointer"
-                    >
-                      <span>{t.demos.openButton}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      {/* 5. VITRINE DES 6 DÉMOS RÉELLES (COMPOSITE APP STORE MOCKUPS & ANIMATIONS) */}
+      <DemosShowcase onOpenStudio={onOpenStudio} />
 
       {/* 6. ARCHITECTURE TECHNIQUE & VÉRITÉ ZÉRO-CLOUD */}
       <section id="architecture" className="bg-[#f5f5f7] py-24 px-6">

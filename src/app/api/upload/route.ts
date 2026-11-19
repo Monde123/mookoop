@@ -64,9 +64,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: UPLOAD_ERRORS.imageCorrupt }, { status: 400 });
   }
 
+  if (process.env.VERCEL) {
+    return NextResponse.json({ ok: false, serverless: true, error: "Serverless environment: image stored client-side" });
+  }
+
   try {
     return NextResponse.json({ ok: true, path: await saveAsset("image", parsed.bytes, ext) });
   } catch (e) {
+    const err = e as NodeJS.ErrnoException;
+    if (err.code === "EROFS" || err.message?.includes("read-only")) {
+      return NextResponse.json({ ok: false, serverless: true, error: "Read-only filesystem: image stored client-side" });
+    }
     return NextResponse.json(
       { ok: false, error: e instanceof Error ? e.message : String(e) },
       { status: 500 },

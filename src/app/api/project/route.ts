@@ -49,6 +49,11 @@ export async function POST(req: Request) {
   if (validationError) {
     return NextResponse.json({ ok: false, error: validationError }, { status: 400 });
   }
+  // In serverless production environments (such as Vercel), the filesystem is read-only
+  // and each user retains their own private project locally in browser storage.
+  if (process.env.VERCEL) {
+    return NextResponse.json({ ok: true, serverless: true });
+  }
   // Compare and replace in one queue so two tabs cannot both save the same
   // revision. CLI writers may omit If-Match for backwards compatibility.
   const result = writes.then(() => writeProject(body, req.headers.get("if-match")));
@@ -79,6 +84,10 @@ async function writeProject(body: unknown, expected: string | null) {
     await fs.rename(temporary, filePath());
     return NextResponse.json({ ok: true }, { headers: { ETag: revision(pretty) } });
   } catch (e) {
+    const err = e as NodeJS.ErrnoException;
+    if (err.code === "EROFS" || err.message?.includes("read-only")) {
+      return NextResponse.json({ ok: true, serverless: true });
+    }
     return NextResponse.json(
       { ok: false, error: e instanceof Error ? e.message : String(e) },
       { status: 500 },

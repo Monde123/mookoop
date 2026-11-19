@@ -77,9 +77,20 @@ export async function POST(req: Request) {
   }
 
   try {
+    if (process.env.VERCEL) {
+      const mime = UPLOADED_ASSETS.font.types[format];
+      const font: ImportedFont = { src: `data:${mime};base64,${body.data}`, format };
+      return NextResponse.json({ ok: true, font });
+    }
     const font: ImportedFont = { src: await saveAsset("font", bytes, FONT_EXTENSION[format]), format };
     return NextResponse.json({ ok: true, font });
   } catch (e) {
+    const err = e as NodeJS.ErrnoException;
+    if (err.code === "EROFS" || err.message?.includes("read-only")) {
+      const mime = UPLOADED_ASSETS.font.types[format];
+      const font: ImportedFont = { src: `data:${mime};base64,${body.data}`, format };
+      return NextResponse.json({ ok: true, font });
+    }
     return NextResponse.json(
       { ok: false, error: e instanceof Error ? e.message : String(e) },
       { status: 500 },

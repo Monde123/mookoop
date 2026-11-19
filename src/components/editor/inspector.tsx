@@ -78,6 +78,7 @@ import type {
 import { BackgroundControls } from "./background-controls";
 import { ScreenshotPicker } from "./screenshot-picker";
 import { CalloutControls } from "./callout-controls";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   slide: Slide;
@@ -114,6 +115,9 @@ export function Inspector({
   onUpdate,
   onSelectElement,
 }: Props) {
+  const { t } = useI18n();
+  const insp = t.studio.inspector;
+
   const isFeatureGraphic = isBanner(slide, device);
   const drawn = elementRects(slide, device, orientation);
   const layoutOptions = selectableLayouts(device).map((layout) => [layout, layoutLabel(layout, device)] as const);
@@ -123,8 +127,10 @@ export function Inspector({
   const localeHeadline = slide.headline?.[locale] ?? "";
   // When the active locale is empty, surface the fallback (typically en) as
   // the placeholder so the user sees what they're translating from.
-  const headlineDefault = isFeatureGraphic ? "Your tagline." : "One idea\nper slide.";
-  const labelPlaceholder = localeLabel ? "FEATURE 01" : pickText(slide.label, locale) || "FEATURE 01";
+  const headlineDefault = isFeatureGraphic ? insp.taglinePlaceholder : insp.headlinePlaceholder;
+  const labelPlaceholder = localeLabel
+    ? (isFeatureGraphic ? insp.labelPromoPlaceholder : insp.labelPlaceholder)
+    : pickText(slide.label, locale) || (isFeatureGraphic ? insp.labelPromoPlaceholder : insp.labelPlaceholder);
   const headlinePlaceholder = localeHeadline
     ? headlineDefault
     : pickText(slide.headline, locale) || headlineDefault;
@@ -173,9 +179,9 @@ export function Inspector({
     <div className="flex h-full flex-col bg-white">
       <div className="border-b border-border/80 px-4 py-3 bg-white">
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="text-sm font-semibold tracking-tight text-[#101010]">Screen settings</h2>
+          <h2 className="text-sm font-semibold tracking-tight text-[#101010]">{insp.screenSettings}</h2>
           <span className="text-[10px] uppercase font-bold tracking-wider text-[#6e6e73]">
-            editing · {locale.toUpperCase()}
+            {insp.editing} · {locale.toUpperCase()}
           </span>
         </div>
         <p className="text-xs text-[#6e6e73] mt-0.5">{layoutHint(slide.layout, device)}</p>
@@ -183,7 +189,7 @@ export function Inspector({
 
       <div className="flex-1 space-y-4 overflow-y-auto px-4 py-3.5 custom-scrollbar">
         <div className="space-y-1.5">
-          <Label className="text-xs">Layout</Label>
+          <Label className="text-xs">{insp.layout}</Label>
           <Select
             value={slide.layout}
             onValueChange={(layout) => {
@@ -198,7 +204,7 @@ export function Inspector({
               });
             }}
           >
-            <SelectTrigger aria-label="Layout">
+            <SelectTrigger aria-label={insp.layout}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -213,36 +219,32 @@ export function Inspector({
 
         {isCreative(device) && (
           <p className="rounded-md border border-green-600/30 bg-green-600/5 p-2 text-[11px] leading-relaxed text-muted-foreground">
-            Keep the message and focal art inside the green <span className="font-medium text-foreground">art safe area</span>
-            {device === "creative-universal"
-              ? "; the backdrop fills the rest. One universal asset is used for both the product page header and search results. The dashed crops are estimates. Check the real result with App Store Connect's Preview tool."
-              : "; the backdrop fills the rest."}{" "}
-            Write a short brand line here; don&apos;t reuse a long screenshot headline.
+            {insp.safeAreaNotice}
           </p>
         )}
 
         <BackgroundControls slide={isFeatureGraphic ? { ...slide, inverted: slide.inverted ?? true } : slide} theme={theme} onChange={onChange} />
 
         <div className="space-y-1.5">
-          <Label className="text-xs">{isFeatureGraphic ? "Badge promotionnel (Optionnel)" : "Label"}</Label>
+          <Label className="text-xs">{isFeatureGraphic ? insp.labelPromoBadge : insp.label}</Label>
           <Input
-            aria-label={isFeatureGraphic ? "Badge promotionnel" : "Label"}
+            aria-label={isFeatureGraphic ? insp.labelPromoBadge : insp.label}
             value={localeLabel}
             onChange={(e) => setLocaleField("label", e.target.value)}
-            placeholder={isFeatureGraphic ? "ex: 100% HORS-LIGNE, NOUVEAU, ★ 4.9" : labelPlaceholder}
+            placeholder={isFeatureGraphic ? insp.labelPromoPlaceholder : insp.labelPlaceholder}
           />
         </div>
 
         <div className="space-y-1.5">
           <div className="flex items-baseline justify-between">
-            <Label className="text-xs">{isFeatureGraphic ? "Tagline" : "Headline"}</Label>
+            <Label className="text-xs">{isFeatureGraphic ? insp.tagline : insp.headline}</Label>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-muted-foreground">newline = break</span>
-              <CopyIdeasMenu onPick={(formula) => setLocaleField("headline", formula)} />
+              <span className="text-[10px] text-muted-foreground">{insp.newlineHint}</span>
+              <CopyIdeasMenu onPick={(formula) => setLocaleField("headline", formula)} copyIdeasText={insp.copyIdeas} />
             </div>
           </div>
           <Textarea
-            aria-label={isFeatureGraphic ? "Tagline" : "Headline"}
+            aria-label={isFeatureGraphic ? insp.tagline : insp.headline}
             value={localeHeadline}
             onChange={(e) => setLocaleField("headline", e.target.value)}
             rows={3}
@@ -318,10 +320,10 @@ export function Inspector({
                   <SelectValue placeholder="Disposition" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="split">📱 Standard Play Store (Smartphone à droite + Texte)</SelectItem>
-                  <SelectItem value="centered">✨ Centré Majestic (Logo au centre + Halo lumineux)</SelectItem>
-                  <SelectItem value="two-devices">📲 Duo Perspectives (2 Smartphones en vitrine)</SelectItem>
-                  <SelectItem value="minimal">🖋️ Épuré Minimal (Texte + Icône seule)</SelectItem>
+                  <SelectItem value="split">Standard Play Store (Smartphone à droite + Texte)</SelectItem>
+                  <SelectItem value="centered">Centré Majestic (Logo au centre + Halo lumineux)</SelectItem>
+                  <SelectItem value="two-devices">Duo Perspectives (2 Smartphones en vitrine)</SelectItem>
+                  <SelectItem value="minimal">Épuré Minimal (Texte + Icône seule)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -421,7 +423,7 @@ function CaptureNote({ device, src }: { device: Device; src: string }) {
   );
 }
 
-function CopyIdeasMenu({ onPick }: { onPick: (formula: string) => void }) {
+function CopyIdeasMenu({ onPick, copyIdeasText = "Copy ideas" }: { onPick: (formula: string) => void; copyIdeasText?: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -433,7 +435,7 @@ function CopyIdeasMenu({ onPick }: { onPick: (formula: string) => void }) {
           title="Insert a headline formula, then replace the [bracketed] words"
         >
           <Lightbulb className="h-3 w-3" />
-          Copy ideas
+          {copyIdeasText}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="max-h-[420px] w-72 overflow-y-auto">
@@ -1185,7 +1187,9 @@ function TypographySection({
   slide: Slide;
   isFeatureGraphic: boolean;
   onChange: (patch: Partial<Slide>) => void;
-  }) {
+}) {
+  const { t } = useI18n();
+  const insp = t.studio.inspector;
   const scales = slideFontScales(slide);
   const customized = !!cleanTypography(slide.typography);
 
@@ -1199,9 +1203,9 @@ function TypographySection({
     <div className="space-y-3 rounded-xl border border-border/80 bg-[#fbfbfd] p-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <Label className="text-xs font-semibold">Text size</Label>
+          <Label className="text-xs font-semibold">{insp.fontSize}</Label>
           <p className="text-[11px] text-muted-foreground">
-            Relative to the layout default.
+            {insp.typography}
           </p>
         </div>
         {customized && (
@@ -1211,7 +1215,7 @@ function TypographySection({
             size="sm"
             className="h-6 shrink-0 gap-1 px-1.5 text-[11px] text-muted-foreground"
             onClick={() => onChange({ typography: undefined })}
-            title="Reset all text sizes to 100%"
+            title="Reset"
           >
             <RotateCcw className="h-3 w-3" />
             Reset
@@ -1245,11 +1249,11 @@ function TypographySection({
 
       <div className="space-y-1.5 pt-2 border-t">
         <div className="flex items-center justify-between">
-          <Label className="text-[11px] text-muted-foreground">Alignement du texte</Label>
+          <Label className="text-[11px] text-muted-foreground">{insp.textAlign}</Label>
           {slide.captionAlign && (
             <ResetButton
               visible={!!slide.captionAlign}
-              label="Rétablir l'alignement par défaut"
+              label={insp.resetPosition}
               onClick={() => onChange({ captionAlign: undefined })}
             />
           )}
@@ -1259,7 +1263,7 @@ function TypographySection({
             disabled={false}
             active={slide.captionAlign === "left"}
             onClick={() => onChange({ captionAlign: "left" })}
-            label="Aligner à gauche"
+            label={insp.alignLeft}
           >
             <AlignLeft className="h-3.5 w-3.5" />
           </LayerButton>
@@ -1267,7 +1271,7 @@ function TypographySection({
             disabled={false}
             active={slide.captionAlign === "center" || (!slide.captionAlign && (isFeatureGraphic ? slide.featureLayout === "centered" : true))}
             onClick={() => onChange({ captionAlign: "center" })}
-            label="Centrer"
+            label={insp.alignCenter}
           >
             <AlignCenter className="h-3.5 w-3.5" />
           </LayerButton>
@@ -1275,7 +1279,7 @@ function TypographySection({
             disabled={false}
             active={slide.captionAlign === "right"}
             onClick={() => onChange({ captionAlign: "right" })}
-            label="Aligner à droite"
+            label={insp.alignRight}
           >
             <AlignRight className="h-3.5 w-3.5" />
           </LayerButton>

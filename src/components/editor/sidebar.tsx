@@ -21,6 +21,7 @@ import type { Device, Orientation, Scene, Slide, Theme } from "@/lib/types";
 import { DEVICES } from "@/lib/devices";
 import { newSlide } from "@/lib/defaults";
 import { SlideThumb } from "./slide-thumb";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   slides: Slide[];
@@ -61,6 +62,9 @@ export function Sidebar({
   onDuplicate,
   onAdd,
 }: Props) {
+  const { t } = useI18n();
+  const sb = t.studio.sidebar;
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -78,9 +82,9 @@ export function Sidebar({
   return (
     <div className="flex h-full flex-col bg-white">
       <div className="border-b border-[#f0f0f0] p-3.5">
-        <h2 className="text-sm font-semibold text-[#101010]">Écrans du projet</h2>
+        <h2 className="text-sm font-semibold text-[#101010]">{sb.title}</h2>
         <p className="text-xs text-[#6e6e73]">
-          {slides.length} écran{slides.length > 1 ? "s" : ""} · glisser pour réordonner
+          {slides.length} {slides.length > 1 ? sb.screenPlural : sb.screenSingular} · {sb.reorderHint}
         </p>
       </div>
 
@@ -111,10 +115,8 @@ export function Sidebar({
               ))}
               {slides.length === 0 && (
                 <div className="rounded-xl border border-dashed border-[#d0d0d3] p-6 text-center bg-[#f5f5f7]">
-                  <p className="text-xs font-semibold text-[#101010]">Aucun écran</p>
-                  <p className="mt-1 text-[11px] text-[#6e6e73]">
-                    Cliquez sur <span className="font-semibold text-[#101010]">Add screen</span> pour commencer.
-                  </p>
+                  <p className="text-xs font-semibold text-[#101010]">{sb.emptyTitle}</p>
+                  <p className="mt-1 text-[11px] text-[#6e6e73]">{sb.emptyDesc}</p>
                 </div>
               )}
             </div>
@@ -134,7 +136,7 @@ export function Sidebar({
           }
           disabled={disabled}
         >
-          <Plus className="h-4 w-4" /> Add screen
+          <Plus className="h-4 w-4" /> {sb.addScreen}
         </Button>
       </div>
     </div>

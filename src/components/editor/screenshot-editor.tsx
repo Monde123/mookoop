@@ -2,6 +2,7 @@
 import * as React from "react";
 import { flushSync } from "react-dom";
 import JSZip from "jszip";
+import { Layers, LayoutGrid, SlidersHorizontal } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { DEFAULT_SCREENSHOT_FONT_ID, IMPORTED_FONT_FAMILY, hasTheme, screenshotFontFamily, themeById } from "@/lib/constants";
 import { copySlide, updateDeck, updateSlide as updateSlideIn, withElementTransform } from "@/lib/deck";
@@ -13,7 +14,7 @@ import { setFrameAssets, type FrameFile, type MeasuredFrame } from "@/lib/frame-
 import { didFail, preloadImages } from "@/lib/image-cache";
 import { writeLocalized } from "@/lib/locale";
 import { useProject } from "@/lib/storage";
-import { downloadBlob, slugify } from "@/lib/utils";
+import { cn, downloadBlob, slugify } from "@/lib/utils";
 import type { ElementId, ElementTransform, ImportedFont, SelectedElement, ProjectState, Slide } from "@/lib/types";
 import { Inspector } from "./inspector";
 import { PreviewStage } from "./preview-stage";
@@ -21,10 +22,17 @@ import { Sidebar } from "./sidebar";
 import { DeckCanvas } from "./slide-canvas";
 import { StyleLab } from "./style-lab";
 import { Toolbar } from "./toolbar";
+import { StudioSkeleton } from "./studio-skeleton";
 import { DEMO_PACKS, type DemoPreset } from "@/lib/demos";
+import { useI18n } from "@/lib/i18n";
+
+type MobileStudioTab = "canvas" | "screens" | "inspect";
 
 export function ScreenshotEditor() {
+  const { t } = useI18n();
+  const mNav = t.studio.mobileNav;
   const { state, setState, hydrated, savedAt, saveError, retrySave, reset, resetDevice, undo, redo, canUndo, canRedo } = useProject();
+  const [mobileTab, setMobileTab] = React.useState<MobileStudioTab>("canvas");
   const [activeSlideId, setActiveSlideId] = React.useState<string | null>(null);
   const [selectedElement, setSelectedElement] = React.useState<SelectedElement | null>(null);
   const [exporting, setExporting] = React.useState<string | null>(null);
@@ -49,6 +57,18 @@ export function ScreenshotEditor() {
   const fontId = state.fontId || DEFAULT_SCREENSHOT_FONT_ID;
   const fontFamily = screenshotFontFamily(fontId);
   useImportedFontFace(state.importedFont);
+
+  React.useEffect(() => {
+    // Strictly prevent any window/body level scrolling while the studio is active
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
+  }, []);
 
   React.useEffect(() => {
     if (selectedElement && selectedElement.slideId !== activeSlide?.id) {
@@ -576,14 +596,7 @@ export function ScreenshotEditor() {
   }
 
   if (!hydrated || !ready || !framesLoaded) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="flex flex-col items-center gap-2 text-muted-foreground">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-current border-t-transparent" />
-          <p className="text-sm">Loading editor…</p>
-        </div>
-      </div>
-    );
+    return <StudioSkeleton />;
   }
 
   const busy = !!exporting;
@@ -592,7 +605,7 @@ export function ScreenshotEditor() {
   const exportCanvas = canvasSize(exportState.device, exportState.orientation);
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-background">
+    <div className="fixed inset-0 flex h-screen w-screen flex-col overflow-hidden bg-background select-none animate-in fade-in duration-300">
       <Toaster position="bottom-center" richColors closeButton />
       <Toolbar
         appName={state.appName}
@@ -645,8 +658,14 @@ export function ScreenshotEditor() {
         busy={busy}
       />
 
-      <div inert={busy} aria-busy={busy} className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
-        <aside className="lg:w-72 w-full shrink-0 border-r border-border/80 bg-white lg:max-h-none max-h-64 overflow-hidden">
+      <div inert={busy} aria-busy={busy} className="relative flex min-h-0 flex-1 overflow-hidden lg:flex-row">
+        <aside
+          className={cn(
+            "border-r border-border/80 bg-white overflow-hidden shrink-0",
+            "lg:flex lg:w-72 lg:max-h-none",
+            mobileTab === "screens" ? "flex flex-1 w-full pb-14" : "hidden",
+          )}
+        >
           <Sidebar
             slides={currentSlides}
             activeId={activeSlide?.id || null}
@@ -661,14 +680,26 @@ export function ScreenshotEditor() {
             scene={state.scene}
             disabled={busy}
             onReorder={reorderSlides}
-            onSelect={setActiveSlideId}
+            onSelect={(id) => {
+              setActiveSlideId(id);
+              setMobileTab("canvas");
+            }}
             onDelete={deleteSlide}
             onDuplicate={duplicateSlide}
-            onAdd={addSlide}
+            onAdd={(slide) => {
+              addSlide(slide);
+              setMobileTab("canvas");
+            }}
           />
         </aside>
 
-        <main className="flex h-[26rem] shrink-0 items-stretch overflow-hidden lg:h-auto lg:min-h-0 lg:flex-1">
+        <main
+          className={cn(
+            "items-stretch overflow-hidden bg-[#f5f5f7] min-h-0",
+            "lg:flex lg:flex-1",
+            mobileTab === "canvas" ? "flex flex-1 w-full pb-14" : "hidden",
+          )}
+        >
           {activeSlide && currentSlides.length > 0 ? (
             <PreviewStage
               slides={currentSlides}
@@ -698,7 +729,13 @@ export function ScreenshotEditor() {
           )}
         </main>
 
-        <aside className="lg:w-80 w-full shrink-0 border-l border-border/80 bg-white lg:max-h-none max-h-96 overflow-hidden">
+        <aside
+          className={cn(
+            "border-l border-border/80 bg-white overflow-hidden shrink-0",
+            "lg:flex lg:w-80 lg:max-h-none",
+            mobileTab === "inspect" ? "flex flex-1 w-full pb-14" : "hidden",
+          )}
+        >
           {activeSlide ? (
             <Inspector
               key={`${state.device}:${activeSlide.id}`}
@@ -729,6 +766,53 @@ export function ScreenshotEditor() {
         </aside>
       </div>
 
+      <nav
+        aria-label="Mode d'affichage studio"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#f0f0f0] px-6 py-2 flex items-center justify-around shadow-[0_-2px_10px_rgba(0,0,0,0.04)]"
+      >
+        <button
+          type="button"
+          onClick={() => setMobileTab("screens")}
+          className={cn(
+            "flex flex-col items-center gap-1 py-1 px-3.5 rounded-xl text-[11px] font-medium transition-colors cursor-pointer",
+            mobileTab === "screens"
+              ? "text-[#0088ff] font-semibold bg-[#0088ff]/10"
+              : "text-[#6e6e73] hover:text-[#101010]",
+          )}
+        >
+          <Layers className="h-4 w-4" />
+          <span>{mNav.screens} ({currentSlides.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMobileTab("canvas")}
+          className={cn(
+            "flex flex-col items-center gap-1 py-1 px-3.5 rounded-xl text-[11px] font-medium transition-colors cursor-pointer",
+            mobileTab === "canvas"
+              ? "text-[#0088ff] font-semibold bg-[#0088ff]/10"
+              : "text-[#6e6e73] hover:text-[#101010]",
+          )}
+        >
+          <LayoutGrid className="h-4 w-4" />
+          <span>{mNav.canvas}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMobileTab("inspect")}
+          className={cn(
+            "flex flex-col items-center gap-1 py-1 px-3.5 rounded-xl text-[11px] font-medium transition-colors cursor-pointer",
+            mobileTab === "inspect"
+              ? "text-[#0088ff] font-semibold bg-[#0088ff]/10"
+              : "text-[#6e6e73] hover:text-[#101010]",
+          )}
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          <span>{mNav.inspector}</span>
+        </button>
+      </nav>
+
       <StyleLab
         open={styleLabOpen}
         onOpenChange={setStyleLabOpen}
@@ -757,9 +841,12 @@ export function ScreenshotEditor() {
       <div
         aria-hidden
         style={{
-          position: "absolute",
+          position: "fixed",
           left: -99999,
           top: 0,
+          width: 0,
+          height: 0,
+          overflow: "hidden",
           pointerEvents: "none",
         }}
       >

@@ -15,6 +15,7 @@ import type {
   Theme,
 } from "@/lib/types";
 import { DeckCanvas, SlideCanvas } from "./slide-canvas";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   slides: Slide[];
@@ -59,6 +60,8 @@ export function PreviewStage({
   onElementChange,
   onSelectElement,
 }: Props) {
+  const { t } = useI18n();
+  const cv = t.studio.canvas;
   const containerRef = React.useRef<HTMLDivElement>(null);
   const scrollerRef = React.useRef<HTMLDivElement>(null);
   const suppressNextActiveScreenPanRef = React.useRef(false);
@@ -76,8 +79,10 @@ export function PreviewStage({
     if (!el) return;
     const update = () => {
       const rect = el.getBoundingClientRect();
-      const sx = (rect.width - 96) / cW;
-      const sy = (rect.height - 96) / cH;
+      const padX = rect.width < 768 ? 32 : 64;
+      const padY = rect.height < 600 ? 32 : 56;
+      const sx = (rect.width - padX) / cW;
+      const sy = (rect.height - padY) / cH;
       setFitScale(Math.max(0.05, Math.min(sx, sy)));
     };
     update();
@@ -121,48 +126,92 @@ export function PreviewStage({
     [activeSlideId, onActiveSlideChange],
   );
 
-  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    // Zoom on Ctrl / Cmd + wheel or trackpad pinch
-    if (e.ctrlKey || e.metaKey) {
+  const isDraggingRef = React.useRef(false);
+  const dragStartXRef = React.useRef(0);
+  const scrollStartLeftRef = React.useRef(0);
+
+  // Native non-passive wheel interception (strictly prevents document scroll & translates to horizontal pan/zoom)
+  React.useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
-      setZoom((z) => Math.min(2.5, Math.max(0.2, Math.round(z * zoomFactor * 100) / 100)));
-      return;
+      e.stopPropagation();
+
+      // Zoom on Ctrl / Cmd + wheel or trackpad pinch
+      if (e.ctrlKey || e.metaKey) {
+        const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+        setZoom((z) => Math.min(2.5, Math.max(0.2, Math.round(z * zoomFactor * 100) / 100)));
+        return;
+      }
+
+      // Smooth horizontal pan on normal wheel or trackpad swipe
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      scroller.scrollLeft += delta;
+    };
+
+    scroller.addEventListener("wheel", onWheel, { passive: false });
+    return () => scroller.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    const target = e.target as HTMLElement;
+    if (target.closest("input, textarea, button, [contenteditable='true']")) return;
+
+    isDraggingRef.current = true;
+    dragStartXRef.current = e.clientX;
+    if (scrollerRef.current) {
+      scrollStartLeftRef.current = scrollerRef.current.scrollLeft;
     }
-    // Convert vertical wheel to horizontal panning on scroller
-    if (scrollerRef.current && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-      scrollerRef.current.scrollLeft += e.deltaY;
-    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current || !scrollerRef.current) return;
+    const deltaX = e.clientX - dragStartXRef.current;
+    scrollerRef.current.scrollLeft = scrollStartLeftRef.current - deltaX;
+  };
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
   };
 
   return (
     <div
       ref={containerRef}
-      className="relative h-full w-full overflow-hidden bg-[#f5f5f7] select-none"
+      className="relative h-full w-full overflow-hidden bg-[#f5f5f7] select-none flex flex-col"
     >
       <div
         ref={scrollerRef}
-        onWheel={handleWheel}
-        className="h-full w-full overflow-auto p-12 custom-scrollbar"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        className="h-full w-full overflow-x-auto overflow-y-hidden custom-scrollbar flex min-h-full items-center cursor-grab active:cursor-grabbing"
       >
         <div
-          style={{
-            width: totalW * scale,
-            height: cH * scale,
-            position: "relative",
-            flexShrink: 0,
-            filter: "drop-shadow(0 24px 60px rgba(16, 16, 16, 0.12))",
-          }}
+          className="m-auto p-6 md:p-8 flex items-center justify-center shrink-0 cursor-default"
+          style={{ minWidth: "100%", minHeight: "100%" }}
         >
           <div
             style={{
-              width: totalW,
-              height: cH,
-              transform: `scale(${scale})`,
-              transformOrigin: "top left",
+              width: totalW * scale,
+              height: cH * scale,
+              position: "relative",
+              flexShrink: 0,
+              filter: "drop-shadow(0 24px 60px rgba(16, 16, 16, 0.12))",
             }}
           >
-            <DeckCanvas
+            <div
+              style={{
+                width: totalW,
+                height: cH,
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+              }}
+            >
+              <DeckCanvas
               slides={slides}
               device={device}
               orientation={orientation}
@@ -190,13 +239,14 @@ export function PreviewStage({
           </div>
         </div>
       </div>
+    </div>
 
       <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs text-[#6e6e73] shadow-sm backdrop-blur border border-[#e5e5ea]">
         <span className="font-semibold text-[#101010]">{DEVICES[device].label}</span>
         {activeSlide && (
           <>
             <span aria-hidden>·</span>
-            <span>Screen {activeIndex + 1}</span>
+            <span>{cv.screen} {activeIndex + 1}</span>
             <span aria-hidden>·</span>
             <span>{layoutLabel(activeSlide.layout, device)}</span>
           </>
@@ -204,13 +254,13 @@ export function PreviewStage({
         {orientation === "landscape" && (
           <>
             <span aria-hidden>·</span>
-            <span>landscape</span>
+            <span>{cv.landscape}</span>
           </>
         )}
         {!connectedCanvas && (
           <>
             <span aria-hidden>·</span>
-            <span>isolated</span>
+            <span>{cv.isolated}</span>
           </>
         )}
       </div>

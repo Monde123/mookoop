@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { AlertTriangle, Archive, Check, Cloud, Download, FlaskConical, Home, Redo2, RotateCcw, Sparkles, Undo2, UnfoldHorizontal, Upload } from "lucide-react";
+import { AlertTriangle, Archive, Check, Cloud, Download, FlaskConical, Redo2, RotateCcw, Sparkles, Undo2, UnfoldHorizontal, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MookoopLogo } from "@/components/brand/logo";
 import { DemosDialog } from "./demos-dialog";
@@ -36,6 +36,8 @@ import {
 import type { Device, ImportedFont, Orientation, Platform, Scene, ScreenshotFontId, Theme } from "@/lib/types";
 import { FontImporter, type FontImporterHandle } from "./font-importer";
 import { ScenePlayground } from "./scene-playground";
+import { useI18n } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 const IMPORT_FONT_ACTION = "__import-font__";
 
@@ -98,6 +100,9 @@ export function Toolbar(props: Props) {
   const activeTheme = themeById(props.themeId);
 
   const fontImporter = React.useRef<FontImporterHandle>(null);
+  const { t, locale: uiLocale, setLocale: setUiLocale } = useI18n();
+  const tb = t.studio.toolbar;
+
   const [importingFont, setImportingFont] = React.useState(false);
   const fontIds = (Object.keys(SCREENSHOT_FONTS) as ScreenshotFontId[]).filter((id) => fontAvailable(id, props.importedFont));
   const fontLabel = (id: ScreenshotFontId) =>
@@ -105,45 +110,27 @@ export function Toolbar(props: Props) {
 
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-[#f0f0f0] bg-[#ffffff] px-4 py-2.5 shadow-[0_1px_3px_rgba(16,16,16,0.03)] z-30">
-      <div className="flex items-center gap-2 mr-1 shrink-0">
+      <div className="flex items-center gap-2 mr-2 shrink-0">
         <a
           href="/"
-          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
-          title="Retour à la page d'accueil"
+          className="flex items-center gap-2 hover:opacity-85 transition-opacity"
+          title={tb.homeTitle}
         >
-          <div
-            className="w-7 h-7 rounded-[7px] flex items-center justify-center shadow-sm shrink-0"
-            style={{
-              background:
-                "linear-gradient(0deg, rgb(240, 100, 19) -29.375%, rgb(254, 171, 48) 100%)",
-            }}
-          >
-            <div className="w-3 h-3 bg-white rounded-[2px]" />
-          </div>
-          <span className="text-xs font-bold text-[#101010] hidden sm:inline tracking-tight">mookoop</span>
+          <MookoopLogo className="h-6 w-auto" />
         </a>
       </div>
-
-      <a
-        href="/"
-        className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6e6e73] hover:text-[#101010] px-2.5 py-1 rounded-full hover:bg-[#f5f5f7] transition-colors mr-1"
-        title="Retourner à la page d'accueil"
-      >
-        <Home className="h-3.5 w-3.5" />
-        <span className="hidden md:inline">Accueil</span>
-      </a>
 
       <Button
         type="button"
         variant="outline"
         size="sm"
-        className="h-8 gap-1.5 px-3 rounded-full text-xs font-semibold text-[#f06413] bg-[#f06413]/10 border-[#f06413]/25 hover:bg-[#f06413]/20 hover:text-[#ea580c] transition-all"
+        className="h-8 gap-1.5 px-3 rounded-full text-xs font-medium text-[#101010] bg-[#f5f5f7] border-[#e5e5ea] hover:bg-[#e5e5ea] hover:text-[#000000] transition-all"
         onClick={() => setDemosOpen(true)}
         disabled={props.busy}
-        title="Explorer les modèles et démos universelles"
+        title={tb.modelsTooltip}
       >
-        <Sparkles className="h-3.5 w-3.5 text-[#f06413]" />
-        <span>Modèles</span>
+        <Sparkles className="h-3.5 w-3.5 text-[#6e6e73]" />
+        <span>{tb.models}</span>
       </Button>
 
       <span aria-hidden className="mx-1 h-5 w-px bg-border" />
@@ -152,9 +139,9 @@ export function Toolbar(props: Props) {
         value={props.appName}
         onChange={(e) => props.setAppName(e.target.value)}
         className="h-8 w-36 rounded-full bg-[#f5f5f7] border border-[#e5e5ea] px-3.5 text-xs font-semibold text-[#101010] focus-visible:bg-white focus-visible:border-[#0088ff] focus-visible:ring-1 focus-visible:ring-[#0088ff]"
-        placeholder="App name"
-        aria-label="App name"
-        title="App name (click to edit)"
+        placeholder={tb.appNamePlaceholder}
+        aria-label={tb.appNamePlaceholder}
+        title={tb.appNameTitle}
         disabled={props.busy}
       />
 
@@ -167,15 +154,11 @@ export function Toolbar(props: Props) {
         className="h-8 gap-1.5 px-2 text-xs"
         onClick={() => props.setConnectedCanvas(!props.connectedCanvas)}
         aria-pressed={props.connectedCanvas}
-        title={
-          props.connectedCanvas
-            ? "Connected canvas enabled"
-            : "Isolated screens; turn on to let elements cross screen edges"
-        }
+        title={props.connectedCanvas ? tb.connectedTooltip : tb.isolatedTooltip}
         disabled={props.busy}
       >
         <UnfoldHorizontal className="h-3.5 w-3.5" />
-        {props.connectedCanvas ? "Connected" : "Isolated"}
+        {props.connectedCanvas ? tb.connected : tb.isolated}
       </Button>
 
       <Button
@@ -185,15 +168,15 @@ export function Toolbar(props: Props) {
         className="h-8 gap-1.5 px-2 text-xs"
         onClick={props.onOpenStyleLab}
         disabled={props.busy}
-        title="Style Lab: try complete looks for this deck side by side"
+        title={tb.styleLabTooltip}
       >
         <FlaskConical className="h-3.5 w-3.5" />
-        Style Lab
+        {tb.styleLab}
       </Button>
       <ScenePlayground scene={props.scene} theme={activeTheme} disabled={props.busy} straightDevices={staysStraight(props.device)} onChange={props.setScene} />
 
       <Select value={activeTheme.id} onValueChange={props.setThemeId} disabled={props.busy}>
-        <SelectTrigger className="h-8 w-40 text-xs" title="Theme" aria-label="Theme">
+        <SelectTrigger className="h-8 w-40 text-xs" title={tb.theme} aria-label={tb.theme}>
           <SelectValue>
             <ThemeOption theme={activeTheme} />
           </SelectValue>
@@ -215,9 +198,9 @@ export function Toolbar(props: Props) {
         }}
         disabled={props.busy || importingFont}
       >
-        <SelectTrigger className="h-8 w-36 text-xs" title="Screenshot font" aria-label="Screenshot font">
-          <SelectValue placeholder="Font">
-            <span className="truncate">{importingFont ? "Importing font…" : fontLabel(props.fontId)}</span>
+        <SelectTrigger className="h-8 w-36 text-xs" title={tb.font} aria-label={tb.font}>
+          <SelectValue placeholder={tb.font}>
+            <span className="truncate">{importingFont ? tb.importingFont : fontLabel(props.fontId)}</span>
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
@@ -230,7 +213,7 @@ export function Toolbar(props: Props) {
           <SelectItem value={IMPORT_FONT_ACTION}>
             <span className="flex items-center gap-1.5">
               <Upload className="h-3.5 w-3.5" />
-              {props.importedFont ? "Replace imported font…" : "Import font…"}
+              {props.importedFont ? tb.replaceFont : tb.importFont}
             </span>
           </SelectItem>
         </SelectContent>
@@ -288,19 +271,19 @@ export function Toolbar(props: Props) {
           onValueChange={(v) => props.setOrientation(v as Orientation)}
           disabled={props.busy}
         >
-          <SelectTrigger className="h-8 w-28 text-xs" aria-label="Orientation">
+          <SelectTrigger className="h-8 w-28 text-xs" aria-label={tb.orientation}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="portrait">Portrait</SelectItem>
-            <SelectItem value="landscape">Landscape</SelectItem>
+            <SelectItem value="portrait">{tb.portrait}</SelectItem>
+            <SelectItem value="landscape">{tb.landscape}</SelectItem>
           </SelectContent>
         </Select>
       )}
 
       {showLocale && (
         <Select value={props.locale} onValueChange={props.setLocale} disabled={props.busy}>
-          <SelectTrigger className="h-8 w-20 text-xs" aria-label="Locale">
+          <SelectTrigger className="h-8 w-20 text-xs" aria-label="Deck Locale">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -313,10 +296,44 @@ export function Toolbar(props: Props) {
         </Select>
       )}
 
-      <div className="ml-auto flex shrink-0 items-center gap-2.5">
-        <SaveStatus savedAt={props.savedAt} saveError={props.saveError} />
+      <div className="ml-auto flex shrink-0 items-center gap-2">
+        {/* UI Studio Language Switcher [ FR | EN ] */}
+        <div
+          className="flex items-center p-0.5 rounded-full bg-[#f5f5f7] border border-[#e5e5ea] text-[11px] font-semibold text-[#6e6e73]"
+          role="group"
+          aria-label="Language selection"
+        >
+          <button
+            type="button"
+            onClick={() => setUiLocale("fr")}
+            className={cn(
+              "px-2 py-0.5 rounded-full transition-all cursor-pointer",
+              uiLocale === "fr"
+                ? "bg-white text-[#101010] shadow-[0_1px_2px_rgba(0,0,0,0.06)] font-bold"
+                : "hover:text-[#101010]",
+            )}
+          >
+            FR
+          </button>
+          <button
+            type="button"
+            onClick={() => setUiLocale("en")}
+            className={cn(
+              "px-2 py-0.5 rounded-full transition-all cursor-pointer",
+              uiLocale === "en"
+                ? "bg-white text-[#101010] shadow-[0_1px_2px_rgba(0,0,0,0.06)] font-bold"
+                : "hover:text-[#101010]",
+            )}
+          >
+            EN
+          </button>
+        </div>
+
+        <SaveStatus savedAt={props.savedAt} saveError={props.saveError} tb={tb} />
         {props.saveError && props.onRetrySave && (
-          <Button variant="ghost" size="sm" disabled={props.busy} onClick={props.onRetrySave}>Retry save</Button>
+          <Button variant="ghost" size="sm" disabled={props.busy} onClick={props.onRetrySave}>
+            {tb.retrySave}
+          </Button>
         )}
         
         <div className="flex items-center bg-[#f5f5f7] rounded-full p-0.5 border border-[#e5e5ea]">
@@ -326,8 +343,8 @@ export function Toolbar(props: Props) {
             size="icon"
             className="h-7 w-7 rounded-full text-[#6e6e73] hover:text-[#101010] hover:bg-white transition-all"
             onClick={props.onUndo}
-            title="Undo (⌘Z)"
-            aria-label="Undo"
+            title={tb.undo}
+            aria-label={tb.undo}
             disabled={props.busy || !props.canUndo}
           >
             <Undo2 className="h-3.5 w-3.5" />
@@ -338,8 +355,8 @@ export function Toolbar(props: Props) {
             size="icon"
             className="h-7 w-7 rounded-full text-[#6e6e73] hover:text-[#101010] hover:bg-white transition-all"
             onClick={props.onRedo}
-            title="Redo (⌘⇧Z)"
-            aria-label="Redo"
+            title={tb.redo}
+            aria-label={tb.redo}
             disabled={props.busy || !props.canRedo}
           >
             <Redo2 className="h-3.5 w-3.5" />
@@ -349,8 +366,8 @@ export function Toolbar(props: Props) {
             size="icon"
             className="h-7 w-7 rounded-full text-[#6e6e73] hover:text-[#101010] hover:bg-white transition-all"
             onClick={() => setResetOpen(true)}
-            title="Reset screens to defaults"
-            aria-label="Reset"
+            title={tb.resetTooltip}
+            aria-label={tb.resetTooltip}
             disabled={props.busy}
           >
             <RotateCcw className="h-3.5 w-3.5" />
@@ -363,10 +380,10 @@ export function Toolbar(props: Props) {
           disabled={!!props.exporting || importingFont}
           size="sm"
           className="h-8 gap-1.5 px-3.5 rounded-full text-xs font-medium border-[#d0d0d3] hover:bg-[#f5f5f7] text-[#101010] transition-colors"
-          title="Télécharger immédiatement cet écran en PNG haute résolution"
+          title={tb.downloadPngTooltip}
         >
           <Download className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Télécharger (PNG)</span>
+          <span className="hidden sm:inline">{tb.downloadPng}</span>
         </Button>
 
         <Button
@@ -374,24 +391,24 @@ export function Toolbar(props: Props) {
           disabled={!!props.exporting || importingFont}
           size="sm"
           className="h-8 gap-1.5 px-4 rounded-full text-xs font-semibold bg-[#0088ff] hover:bg-[#1c95ff] text-white shadow-sm transition-all active:scale-[0.98]"
-          title="Exporter tous les écrans et toutes les résolutions dans une archive ZIP"
+          title={tb.exportBundleTooltip}
         >
           <Archive className="h-3.5 w-3.5" />
-          {props.exporting ? `Exportation ${props.exporting}` : "Tout exporter (ZIP)"}
+          {props.exporting ? `${tb.exporting} ${props.exporting}` : tb.exportBundle}
         </Button>
       </div>
 
       <Dialog open={resetOpen} onOpenChange={setResetOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Reset to defaults?</DialogTitle>
+            <DialogTitle>{tb.resetTitle}</DialogTitle>
             <DialogDescription>
-              Choose whether to reset just <span className="font-medium">{DEVICES[props.device].label}</span> or every device deck. Your canvas edits, uploaded screenshots, and copy will be lost.
+              {tb.resetDescription}
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-wrap justify-end gap-2">
             <Button variant="ghost" size="sm" onClick={() => setResetOpen(false)}>
-              Cancel
+              {tb.cancel}
             </Button>
             <Button
               variant="outline"
@@ -401,7 +418,7 @@ export function Toolbar(props: Props) {
                 props.onResetDevice();
               }}
             >
-              Reset {DEVICES[props.device].label} only
+              {tb.resetCurrentDevice} ({DEVICES[props.device].label})
             </Button>
             <Button
               variant="destructive"
@@ -411,7 +428,7 @@ export function Toolbar(props: Props) {
                 props.onResetAll();
               }}
             >
-              Reset all devices
+              {tb.resetAllDevices}
             </Button>
           </div>
         </DialogContent>
@@ -442,7 +459,15 @@ function ThemeOption({ theme }: { theme: Theme }) {
   );
 }
 
-function SaveStatus({ savedAt, saveError }: { savedAt: number | null; saveError: string | null }) {
+function SaveStatus({
+  savedAt,
+  saveError,
+  tb,
+}: {
+  savedAt: number | null;
+  saveError: string | null;
+  tb: { saved: string; saving: string; saveFailed: string };
+}) {
   const [, setTick] = React.useState(0);
   React.useEffect(() => {
     const t = setInterval(() => setTick((x) => x + 1), 60_000);
@@ -455,30 +480,28 @@ function SaveStatus({ savedAt, saveError }: { savedAt: number | null; saveError:
         className="flex items-center gap-1 text-xs text-destructive"
         title={saveError}
       >
-        <AlertTriangle className="h-3.5 w-3.5" /> save failed
+        <AlertTriangle className="h-3.5 w-3.5" /> {tb.saveFailed}
       </span>
     );
   }
 
   if (!savedAt) {
     return (
-      <span className="flex items-center gap-1 text-xs text-muted-foreground" title="Not saved yet">
-        <Cloud className="h-3.5 w-3.5" /> <span className="hidden 2xl:inline">not saved yet</span>
+      <span className="flex items-center gap-1 text-xs text-muted-foreground" title={tb.saving}>
+        <Cloud className="h-3.5 w-3.5" /> <span className="hidden 2xl:inline">{tb.saving}</span>
       </span>
     );
   }
   const seconds = Math.max(0, Math.round((Date.now() - savedAt) / 1000));
-  const label =
+  const timeText =
     seconds < 5
-      ? "saved"
+      ? tb.saved
       : seconds < 60
-        ? `saved ${seconds}s ago`
-        : seconds < 3600
-          ? `saved ${Math.round(seconds / 60)}m ago`
-          : `saved ${Math.round(seconds / 3600)}h ago`;
+        ? `${tb.saved} (${seconds}s)`
+        : `${tb.saved} (${Math.round(seconds / 60)}m)`;
   return (
-    <span className="flex items-center gap-1 text-xs text-muted-foreground" title={`Project ${label}`}>
-      <Check className="h-3.5 w-3.5 text-green-500" /> <span className="hidden 2xl:inline">{label}</span>
+    <span className="flex items-center gap-1 text-xs text-muted-foreground" title={timeText}>
+      <Check className="h-3.5 w-3.5 text-green-500" /> <span className="hidden 2xl:inline">{timeText}</span>
     </span>
   );
 }

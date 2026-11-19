@@ -1,69 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none">
-  <defs>
-    <linearGradient id="logo-bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0F172A"/>
-      <stop offset="100%" stop-color="#020617"/>
-    </linearGradient>
-
-    <linearGradient id="logo-primary" x1="15%" y1="20%" x2="85%" y2="80%">
-      <stop offset="0%" stop-color="#818CF8"/>
-      <stop offset="50%" stop-color="#6366F1"/>
-      <stop offset="100%" stop-color="#06B6D4"/>
-    </linearGradient>
-
-    <linearGradient id="logo-secondary" x1="85%" y1="20%" x2="15%" y2="80%">
-      <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="60%" stop-color="#E0E7FF"/>
-      <stop offset="100%" stop-color="#A5B4FC"/>
-    </linearGradient>
-
-    <linearGradient id="text-oo-1" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#818CF8"/>
-      <stop offset="100%" stop-color="#6366F1"/>
-    </linearGradient>
-
-    <linearGradient id="text-oo-2" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#38BDF8"/>
-      <stop offset="100%" stop-color="#818CF8"/>
-    </linearGradient>
-  </defs>
-
-  <!-- Left Icon Mark (64x64) -->
-  <g transform="translate(8, 8)">
-    <rect x="0" y="0" width="64" height="64" rx="16" fill="url(#logo-bg-grad)" stroke="#1E293B" stroke-width="1.5"/>
-    
-    <!-- Viewfinder corners -->
-    <path d="M 10 18 L 10 12 L 16 12" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M 54 18 L 54 12 L 48 12" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M 10 46 L 10 52 L 16 52" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M 54 46 L 54 52 L 48 52" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
-
-    <!-- Pair 1 of 'oo' -->
-    <circle cx="23" cy="32" r="9" stroke="url(#logo-primary)" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="30" cy="32" r="9" stroke="url(#logo-primary)" stroke-width="3" stroke-linecap="round" stroke-opacity="0.9"/>
-
-    <!-- Pair 2 of 'oo' (factorized) -->
-    <circle cx="34" cy="32" r="9" stroke="url(#logo-secondary)" stroke-width="3" stroke-linecap="round" stroke-opacity="0.95"/>
-    <circle cx="41" cy="32" r="9" stroke="url(#logo-secondary)" stroke-width="3" stroke-linecap="round"/>
-
-    <!-- Factorization Center Dot -->
-    <circle cx="32" cy="32" r="2" fill="#38BDF8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-70 -172.0 614.08 278.0" width="614.08" height="278.0">
+  <path transform="translate(0.00,0) scale(0.12000,-0.12000)" d="M114 -9Q78 -9 62.0 2.0Q46 13 43.0 30.0Q40 47 40 67V417Q40 437 43.5 453.5Q47 470 63.0 480.5Q79 491 116.0 491.0Q153 491 170 477Q185 464 187 436Q197 448 212 460Q228 473 249.5 482.5Q271 492 296 492Q329 492 355.5 482.5Q382 473 403.5 454.5Q425 436 441 408Q455 428 475.0 447.0Q495 466 522.5 479.0Q550 492 584 492Q642 492 682.5 462.5Q723 433 744.0 378.0Q765 323 765 245V66Q765 47 761.5 29.5Q758 12 742.0 1.5Q726 -9 689.0 -9.0Q652 -9 636.5 2.0Q621 13 617.5 30.5Q614 48 614 67V246Q614 277 607.0 298.0Q600 319 585.5 330.5Q571 342 549 342Q526 342 510.0 331.5Q494 321 486.0 299.5Q478 278 478 245V66Q478 46 473.0 28.5Q468 11 451.5 0.5Q435 -10 399.0 -9.0Q363 -8 348.0 3.0Q333 14 330.0 31.5Q327 49 327 67V246Q327 277 320.0 298.5Q313 320 299.0 331.0Q285 342 262 342Q237 342 221.0 329.0Q205 316 197.5 294.5Q190 273 190 246V66Q190 46 186.5 29.0Q183 12 167.0 1.5Q151 -9 114 -9Z" fill="#1F1B16"/>
+  <g transform="translate(102.36,-60.00) scale(0.9375) rotate(-15 60 32)" fill="none" stroke="#1F8A8A" stroke-width="12">
+    <rect x="8" y="6" width="50" height="52" rx="18"/>
+    <rect x="62" y="6" width="50" height="52" rx="18"/>
   </g>
-
-  <!-- Wordmark 'mookoop' -->
-  <g transform="translate(88, 51)" font-family="system-ui, -apple-system, 'Segoe UI', Inter, sans-serif" font-size="34" font-weight="700" letter-spacing="-0.03em">
-    <!-- m -->
-    <text x="0" y="0" fill="#F8FAFC">m</text>
-    <!-- oo (pair 1 - highlighted) -->
-    <text x="33" y="0" fill="url(#text-oo-1)">oo</text>
-    <!-- k -->
-    <text x="73" y="0" fill="#F8FAFC">k</text>
-    <!-- oo (pair 2 - highlighted) -->
-    <text x="94" y="0" fill="url(#text-oo-2)">oo</text>
-    <!-- p -->
-    <text x="134" y="0" fill="#F8FAFC">p</text>
+  <path transform="translate(222.86,0) scale(0.12000,-0.12000)" d="M454 127Q485 100 487.0 75.5Q489 51 460 19Q438 -4 421.5 -11.0Q405 -18 389.0 -11.5Q373 -5 352 14L194 152V66Q194 46 190.5 29.0Q187 12 171.5 1.5Q156 -9 119 -9Q83 -9 67.0 1.5Q51 12 47.5 29.5Q44 47 44 67V644Q44 664 48.0 681.0Q52 698 68.0 708.5Q84 719 120 719Q156 719 171.5 708.5Q187 698 190.5 680.5Q194 663 194 643V341L306 449Q326 468 343.5 475.0Q361 482 378.0 476.0Q395 470 414 449Q446 414 445.0 392.5Q444 371 414 341L306 243Z" fill="#1F1B16"/>
+  <g transform="translate(289.34,-60.00) scale(0.9375) rotate(-15 60 32)" fill="none" stroke="#1F8A8A" stroke-width="12">
+    <rect x="8" y="6" width="50" height="52" rx="18"/>
+    <rect x="62" y="6" width="50" height="52" rx="18"/>
   </g>
-
-  <!-- Subtitle Tagline -->
-  <text x="90" y="66" font-family="system-ui, -apple-system, 'Segoe UI', Inter, sans-serif" font-size="10" font-weight="500" fill="#64748B" letter-spacing="0.08em">UNIVERSAL SCREENSHOT STUDIO</text>
+  <path transform="translate(409.84,0) scale(0.12000,-0.12000)" d="M303 0Q254 0 217 20Q199 28 185 40V-142Q186 -161 182.0 -178.0Q178 -195 162.5 -205.5Q147 -216 110 -216Q74 -216 58.5 -205.5Q43 -195 39.5 -178.5Q36 -162 36 -143V416Q36 436 39.0 452.5Q42 469 57.5 480.0Q73 491 109 491Q140 491 158.5 482.0Q177 473 185 454V449Q200 462 218 472Q254 491 303 491Q347 491 388.5 471.0Q430 451 462.0 416.5Q494 382 512.5 337.0Q531 292 531.0 242.0Q531 192 512.5 147.5Q494 103 462.0 70.0Q430 37 389.0 18.5Q348 0 303 0ZM282 141Q310 141 332.0 154.5Q354 168 367.5 191.0Q381 214 381 242Q381 271 368.0 293.5Q355 316 333.0 329.0Q311 342 283 342Q256 342 233.5 328.5Q211 315 198.5 292.5Q186 270 186.0 242.0Q186 214 199.0 191.0Q212 168 234.0 154.5Q256 141 282 141Z" fill="#1F1B16"/>
 </svg>

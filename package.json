@@ -2,6 +2,7 @@
   "name": "mookoop",
   "version": "1.0.0",
   "description": "Studio open-source de génération de mockups pour Google Play Store et App Store",
+  "license": "MIT",
   "private": false,
   "engines": {
     "node": ">=20.9.0"

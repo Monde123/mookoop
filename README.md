@@ -4,11 +4,12 @@
 
 <p align="center">
   <strong>The open-source interactive canvas studio for App Store & Google Play visuals.</strong><br>
-  Concevez, personnalisez et exportez vos captures d'écran et bannières officielles en haute définition.
+  Concevez, personnalisez et exportez vos captures d'écran et bannières officielles en haute définition.<br>
+  👉 <strong><a href="https://mookoop.studio">https://mookoop.studio</a></strong> (Studio en direct : <strong><a href="https://mookoop.studio/studio">mookoop.studio/studio</a></strong>)
 </p>
 
 <p align="center">
-  <a href="LICENSE.md"><img src="https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg" alt="License: CC BY-NC 4.0" /></a>
+  <a href="LICENSE.md"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
   <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js 16" /></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5-blue?logo=typescript" alt="TypeScript" /></a>
   <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind-3-38B2AC?logo=tailwind-css" alt="Tailwind CSS" /></a>

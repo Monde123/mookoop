@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { ArrowRight, Layers, Sparkles } from "lucide-react";
+import { ArrowRight, Layers } from "lucide-react";
 import type { DemoPreset } from "@/lib/demos";
 import { useI18n } from "@/lib/i18n";
 
@@ -273,9 +273,8 @@ export function DemoMockupCard({ demo, onOpenStudio, index }: DemoMockupCardProp
             <span className="text-[11px] font-semibold text-[#6e6e73] bg-[#f5f5f7] px-2.5 py-0.5 rounded-full tracking-wide">
               {loc.category}
             </span>
-            <span className="text-[11px] font-bold text-[#f06413] bg-[#f06413]/10 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-[#f06413]" />
-              <span>{loc.badge}</span>
+            <span className="text-[11px] font-bold text-[#f06413] bg-[#f06413]/10 px-2.5 py-0.5 rounded-full">
+              {loc.badge}
             </span>
           </div>
 
@@ -293,7 +292,7 @@ export function DemoMockupCard({ demo, onOpenStudio, index }: DemoMockupCardProp
           <div className="flex items-center gap-1.5 text-xs text-[#6e6e73]">
             <Layers className="w-3.5 h-3.5 text-[#0088ff]" />
             <span className="font-medium">
-              {slides.length} {t.studio?.demosDialog?.screensCount || "écrans"}
+              {slides.length} {t.demos.screensCount}
             </span>
           </div>
 
@@ -302,7 +301,7 @@ export function DemoMockupCard({ demo, onOpenStudio, index }: DemoMockupCardProp
             onClick={() => onOpenStudio(demo.id)}
             className="bg-[#101010] group-hover:bg-[#0088ff] text-white text-[13px] font-semibold px-4 py-2 rounded-full transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
           >
-            <span>{t.demos?.openButton || "Ouvrir"}</span>
+            <span>{t.demos.openButton}</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>

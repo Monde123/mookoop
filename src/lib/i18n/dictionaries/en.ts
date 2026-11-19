@@ -112,6 +112,22 @@ export const en: Translations = {
       "Each template includes a sample interface, fonts and a color palette. Load it in one click in the Studio.",
     themeLabel: "Theme",
     openButton: "Open in Studio",
+    screensCount: "screens",
+    categories: {
+      all: "All Models",
+      fintech: "Fintech & Security",
+      ai: "AI & Productivity",
+      ecommerce: "E-Commerce & Luxury",
+      food: "Food & Delivery",
+      fitness: "Health & Fitness",
+      social: "Social & Community",
+    },
+    customCta: {
+      badge: "Free Studio & Multi-Format",
+      title: "Looking to build a custom composition from scratch?",
+      desc: "Start with a clean canvas or customize any of the 6 production models. All visuals export as certified opaque 24-bit PNGs without alpha channel.",
+      button: "Open Blank Studio",
+    },
     presets: {
       novapay: {
         name: "NovaPay",

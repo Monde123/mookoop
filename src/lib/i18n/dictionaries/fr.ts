@@ -112,6 +112,22 @@ export const fr: Translations = {
       "Chaque modèle inclut une interface d'exemple, des polices et une palette de couleurs. Chargez-le en un clic dans le Studio.",
     themeLabel: "Thème",
     openButton: "Ouvrir dans le Studio",
+    screensCount: "écrans",
+    categories: {
+      all: "Tous les modèles",
+      fintech: "Fintech & Sécurité",
+      ai: "IA & Productivité",
+      ecommerce: "E-Commerce & Luxe",
+      food: "Food & Livraison",
+      fitness: "Santé & Sport",
+      social: "Réseaux & Communauté",
+    },
+    customCta: {
+      badge: "Studio Libre & Multi-Formats",
+      title: "Vous souhaitez créer votre propre composition sur mesure ?",
+      desc: "Ouvrez un canvas vierge ou personnalisez l'un des 6 modèles. Tous vos visuels sont exportables en PNG 24 bits certifiés sans canal alpha.",
+      button: "Créer dans le Studio",
+    },
     presets: {
       novapay: {
         name: "NovaPay",

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Sparkles, ArrowRight, Layers } from "lucide-react";
+import { ArrowRight, Layers } from "lucide-react";
 import { DEMO_PACKS, type DemoPreset } from "@/lib/demos";
 import { DemoMockupCard } from "./demo-mockup-card";
 import { useI18n } from "@/lib/i18n";
@@ -13,21 +13,21 @@ interface DemosShowcaseProps {
 type CategoryKey = "all" | "fintech" | "ai" | "ecommerce" | "food" | "fitness" | "social";
 
 export function DemosShowcase({ onOpenStudio }: DemosShowcaseProps) {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey>("all");
 
   const categories: { key: CategoryKey; label: string; count: number }[] = useMemo(() => {
-    const isFr = locale === "fr";
+    const c = t.demos.categories;
     return [
-      { key: "all", label: isFr ? "Tous les modèles" : "All Models", count: DEMO_PACKS.length },
-      { key: "fintech", label: isFr ? "Fintech & Sécurité" : "Fintech & Security", count: 1 },
-      { key: "ai", label: isFr ? "IA & Productivité" : "AI & Productivity", count: 1 },
-      { key: "ecommerce", label: isFr ? "E-Commerce & Luxe" : "E-Commerce & Luxury", count: 1 },
-      { key: "food", label: isFr ? "Food & Livraison" : "Food & Delivery", count: 1 },
-      { key: "fitness", label: isFr ? "Santé & Fitness" : "Health & Fitness", count: 1 },
-      { key: "social", label: isFr ? "Réseaux Sociaux" : "Social & Creators", count: 1 },
+      { key: "all", label: c.all, count: DEMO_PACKS.length },
+      { key: "fintech", label: c.fintech, count: 1 },
+      { key: "ai", label: c.ai, count: 1 },
+      { key: "ecommerce", label: c.ecommerce, count: 1 },
+      { key: "food", label: c.food, count: 1 },
+      { key: "fitness", label: c.fitness, count: 1 },
+      { key: "social", label: c.social, count: 1 },
     ];
-  }, [locale]);
+  }, [t.demos.categories]);
 
   const filteredDemos = useMemo(() => {
     if (selectedCategory === "all") return DEMO_PACKS;
@@ -44,16 +44,15 @@ export function DemosShowcase({ onOpenStudio }: DemosShowcaseProps) {
     <section id="demos" className="py-24 px-6 max-w-[1240px] mx-auto transition-all">
       {/* 1. SECTION HEADER */}
       <div className="text-center max-w-[820px] mx-auto mb-12">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#f5f5f7] border border-[#e5e5ea] text-[12px] font-semibold text-[#6e6e73] mb-4 shadow-2xs">
-          <Sparkles className="w-3.5 h-3.5 text-[#f06413]" />
-          <span>{t.demos?.badge || "Galerie Haute-Fidélité"}</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#f5f5f7] border border-[#e5e5ea] text-[12px] font-semibold text-[#6e6e73] mb-4 shadow-2xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#f06413]" />
+          <span>{t.demos.badge}</span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-[46px] font-bold text-[#101010] tracking-[-0.7px] leading-tight mb-4">
-          {t.demos?.title || "Véritables mockups prêts pour l'App Store & Google Play"}
+          {t.demos.title}
         </h2>
         <p className="text-[17px] text-[#6e6e73] leading-relaxed">
-          {t.demos?.subtitle ||
-            "Explorez nos compositions préconçues. Chaque modèle intègre des fonds thématiques, des accroches typographiques et des cadres d'appareils officiels."}
+          {t.demos.subtitle}
         </p>
       </div>
 
@@ -100,15 +99,15 @@ export function DemosShowcase({ onOpenStudio }: DemosShowcaseProps) {
       {/* 4. BOTTOM FAST-FORWARD CTA BANNER */}
       <div className="rounded-[24px] bg-gradient-to-r from-[#0A0A0C] via-[#111827] to-[#0A0A0C] p-8 sm:p-10 border border-white/10 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-1.5 text-center md:text-left">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#60A5FA] bg-[#1E3A8A]/50 px-3 py-1 rounded-full border border-[#3B82F6]/30 mb-2">
-            <Layers className="w-3.5 h-3.5" />
-            <span>Studio Libre & Multi-Formats</span>
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#60A5FA] bg-[#1E3A8A]/50 px-3 py-1 rounded-full border border-[#3B82F6]/30 mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#60A5FA]" />
+            <span>{t.demos.customCta.badge}</span>
           </div>
           <h3 className="text-2xl font-bold tracking-tight">
-            Vous souhaitez créer votre propre composition sur mesure ?
+            {t.demos.customCta.title}
           </h3>
           <p className="text-sm text-[#94A3B8] max-w-[620px]">
-            Ouvrez un canvas vierge ou personnalisez l'un des 6 modèles. Tous vos visuels sont exportables en PNG 24 bits certifiés sans canal alpha.
+            {t.demos.customCta.desc}
           </p>
         </div>
 
@@ -117,7 +116,7 @@ export function DemosShowcase({ onOpenStudio }: DemosShowcaseProps) {
           onClick={() => onOpenStudio()}
           className="bg-[#0088ff] hover:bg-[#1c95ff] text-white text-[15px] font-semibold px-7 py-3.5 rounded-full shadow-lg transition-all flex items-center gap-2 shrink-0 active:scale-95 cursor-pointer"
         >
-          <span>Créer dans le Studio</span>
+          <span>{t.demos.customCta.button}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

@@ -11,7 +11,6 @@ import {
   Check,
   ShieldCheck,
   Move,
-  Sparkles,
   Cpu,
 } from "lucide-react";
 

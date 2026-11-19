@@ -59,6 +59,22 @@ export interface Translations {
     subtitle: string;
     themeLabel: string;
     openButton: string;
+    screensCount: string;
+    categories: {
+      all: string;
+      fintech: string;
+      ai: string;
+      ecommerce: string;
+      food: string;
+      fitness: string;
+      social: string;
+    };
+    customCta: {
+      badge: string;
+      title: string;
+      desc: string;
+      button: string;
+    };
     presets: Record<string, {
       name: string;
       category: string;

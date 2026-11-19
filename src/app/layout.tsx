@@ -67,27 +67,63 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+  },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "mookoop",
-  url: "https://mookoop.studio",
-  description:
-    "Studio open-source de génération de captures d'écran et bannières officielles pour App Store et Google Play.",
-  applicationCategory: "DesignApplication",
-  operatingSystem: "Web",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "EUR",
-  },
-  featureList: [
-    "Export PNG 24-bit opaque sans canal alpha",
-    "Bannières Feature Graphic Google Play 1024x500 interactives",
-    "Cadres réels Apple et Android haute fidélité",
-    "Persistance privée locale sans base de données externe",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      name: "mookoop",
+      url: "https://mookoop.studio",
+      description:
+        "Studio open-source de génération de captures d'écran et bannières officielles pour App Store et Google Play.",
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Web",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "EUR",
+      },
+      featureList: [
+        "Export PNG 24-bit opaque sans canal alpha",
+        "Bannières Feature Graphic Google Play 1024x500 interactives",
+        "Cadres réels Apple et Android haute fidélité",
+        "Persistance privée locale sans base de données externe",
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "Qu'est-ce que mookoop ?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "mookoop est un studio en ligne gratuit et open-source conçu pour créer des captures d'écran officielles et des bannières Feature Graphic 1024x500 pour App Store et Google Play.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Pourquoi mookoop garantit-il l'absence de canal alpha ?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "App Store Connect et Google Play Console rejettent automatiquement les captures d'écran contenant un canal alpha de transparence. mookoop exporte nativement des fichiers PNG 24-bit opaques.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Mes images ou maquettes sont-elles envoyées sur un serveur ?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Non. Toute la manipulation, le rendu graphique et la sauvegarde s'effectuent localement dans le navigateur de l'utilisateur pour une confidentialité totale.",
+          },
+        },
+      ],
+    },
   ],
 };
 

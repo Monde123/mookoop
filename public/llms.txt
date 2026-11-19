@@ -1,0 +1,19 @@
+# mookoop
+
+> An open-source, client-first studio for designing App Store and Google Play screenshots and banners.
+
+## Overview
+mookoop (https://mookoop.studio) is a free web-based design tool built for mobile developers and designers. It generates pixel-perfect, compliant screenshots and Google Play Feature Graphics without requiring accounts or uploading sensitive images to external servers.
+
+## Key Features
+- **App Store & Google Play Formats**: Preconfigured canvas dimensions for iPhone 16 Pro Max, iPad Pro 13", Android phones, Apple Watch, and Mac.
+- **Google Play Feature Graphic (1024x500)**: Interactive 3D tilt, device repositioning, custom scaling, and badges.
+- **Opaque 24-bit PNG Export**: Guaranteed zero alpha channel to strictly adhere to App Store Connect and Google Play Console upload requirements.
+- **100% Client-Side Privacy**: Renders directly in the browser using HTML5 Canvas. No server-side storage of user images.
+- **Open Source**: MIT licensed Next.js application.
+
+## Core URLs
+- Homepage: https://mookoop.studio
+- Studio: https://mookoop.studio/studio
+- Sitemap: https://mookoop.studio/sitemap.xml
+- Repository: https://github.com/Monde123/mookoop
